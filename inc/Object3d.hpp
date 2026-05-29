@@ -1,0 +1,93 @@
+#pragma once
+
+#include <string>
+#include <sys/types.h>
+#include <vector>
+
+# define PARSER_ERROR_LOG "Exception occurred when parsing line "
+
+enum class ObjType {
+    VERTEX,
+    TEXCOORD,
+    NORMAL,
+    FACE,
+    COMMENT,
+    MTL_LIB,
+    USE_MTL,
+    NAME,
+    SMOOTHING_GROUP,
+    UNKNOWN
+};
+
+ObjType getType(const std::string& token);
+
+/*
+  --- .obj file legend ---
+ * v - vertex pos
+ * vt - texture coord
+ * vn - vertex normal
+ * f - face
+ * # - comment
+*/
+
+/*
+o	Obj name
+g	Group name
+s	Smoothing group
+usemtl	Material name
+mtllib	Material library */
+
+struct Vertex {
+	float x,y,z;
+	Vertex(float x=0, float y=0, float z=0) : x(x), y(y), z(z) {}
+};
+
+struct TexCoord {
+    float u, v;
+    TexCoord(float u=0, float v=0) : u(u), v(v) {}
+};
+
+struct Normal {
+    float nx, ny, nz;
+    Normal(float nx=0, float ny=0, float nz=0) : nx(nx), ny(ny), nz(nz) {}
+};
+
+struct Triangle {
+	int verticesId[3];
+	int texCordIdx[3];
+	int normalIdx[3];
+};
+
+class Object3d {
+public:
+	Object3d(std::string& filename);
+	~Object3d();
+
+	void loadObjFromFile(std::string& filename);
+
+	std::vector<Vertex> getVertices() { return this->m_vertices; }
+
+	std::vector<TexCoord> getTexCoords() { return this->m_texcoords; }
+
+	std::vector<Normal> getNormals() { return this->m_normals; }
+
+	std::vector<Triangle> getTriangles() { return this->m_triangles; }
+
+private:
+	std::vector<Vertex>		m_vertices;
+    std::vector<TexCoord>	m_texcoords;
+    std::vector<Normal>		m_normals;
+    std::vector<Triangle>	m_triangles;
+
+    bool parseLine(const int lineIdx, const std::string& line);
+    void parseVertex(const std::vector<std::string>& tokens);
+    void parseTexCoord(const std::vector<std::string>& tokens);
+    void parseNormal(const std::vector<std::string>& tokens);
+    void parseFace(const std::vector<std::string>& tokens);
+
+    void triangulateQuad(int v1, int v2, int v3);
+
+    void logInfo(const std::string& msg);
+    void logError(int lineIdx, const std::string& errmsg);
+
+};
