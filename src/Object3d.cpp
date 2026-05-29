@@ -86,22 +86,10 @@ bool Object3d::parseLine(const int lineIdx, const std::string& line) {
 					break;
 			}
 		}
-	} catch (const std::invalid_argument& e) {
-		std::cerr << "[Line " << lineIdx << "]: Not a valid number: " << e.what() << std::endl;
-		logError(lineIdx, e.what());
-		return false;
-	} catch (const std::out_of_range& e) {
-    	std::cerr << "[Line " << lineIdx << "]: Number out of range: " << e.what() << std::endl;
-     	logError(lineIdx, e.what());
-     	return false;
-	} catch (const InvalidVertexParamsException& e) {
-    	std::cerr << "[Line " << lineIdx << "]: " << e.what() << std::endl;
-     	logError(lineIdx, e.what());
-     	return false;
-	} catch (const UnknownKeyInObjectFileException& e) {
-		std::cerr << "[Line " << lineIdx << "]: " << e.what() << std::endl;
-		logError(lineIdx, e.what());
-		return false;
+	} catch (const std::exception& e) {
+	    std::cerr << "[Line " << lineIdx << "]: " << e.what() << std::endl;
+	    logError(lineIdx, e.what());
+	    return false;
 	}
 	return true;
 }
