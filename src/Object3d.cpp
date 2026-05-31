@@ -1,7 +1,9 @@
 #include "../inc/Object3d.hpp"
 #include "../inc/util.hpp"
 #include "../inc/exception/InvalidVertexParamsException.hpp"
+#include "../inc/exception/InvalidFaceParamsException.hpp"
 #include "../inc/exception/UnknownKeyInObjectFileException.hpp"
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -69,7 +71,8 @@ bool Object3d::parseLine(const int lineIdx, const std::string& line) {
 					// parseNormal(tokens);
 					break;
 				case ObjType::FACE:
-					// parseFace(tokens);
+					parseFace(tokens);
+					logInfo("Successfully parsed face at line " + std::to_string(lineIdx) + "\n");
 					break;
 				case ObjType::COMMENT:
 					break;
@@ -104,4 +107,113 @@ void Object3d::parseVertex(const std::vector<std::string>& tokens) {
 		std::stof(tokens[3])
 	);
 	this->m_vertices.push_back(v);
+}
+
+/* The .obj file indexing starts from 1, which is super fucking dumb :)
+ * The tokens are passed to the utility with an off-by-one guard.
+ */
+void Object3d::parseFace(const std::vector<std::string>& tokens) {
+    if (tokens.size() == 4) {
+        Triangle triangle = Triangle{};
+        for (int i = 0; i < 3; i++) {
+            parseFaceTokenIndices(triangle, i, tokens[i + 1]);
+        }
+        m_triangles.push_back(triangle);
+
+    } else if (tokens.size() == 5) {
+        Quad quad = Quad{};
+        for (int i = 0; i < 4; i++) {
+            parseFaceTokenIndices(quad, i, tokens[i + 1]);
+        }
+        Triangle t1, t2;
+        triangulateQuad(quad, t1, t2);
+        m_triangles.push_back(t1);
+        m_triangles.push_back(t2);
+    } else {
+        throw InvalidFaceParamsException("Invalid face definition: invalid number of arguments.");
+    }
+}
+
+template<typename T>
+void Object3d::parseFaceTokenIndices(T& shape, int pos, const std::string& indicesStr) {
+    std::vector<std::string> indices = split(indicesStr, FACE_TOKEN_DELIMITER);
+
+    shape.verticesId[pos] = std::stoi(indices[0]) - 1;
+
+    if (indices.size() >= 2 && !indices[1].empty()) {
+        shape.texCordIdx[pos] = std::stoi(indices[1]) - 1;
+    } else {
+        shape.texCordIdx[pos] = -1;
+    }
+
+    if (indices.size() >= 3 && !indices[2].empty()) {
+        shape.normalIdx[pos] = std::stoi(indices[2]) - 1;
+    } else {
+        shape.normalIdx[pos] = -1;
+    }
+}
+
+void Object3d::triangulateQuad(Quad& q, Triangle& t1, Triangle& t2) {
+    t1.verticesId[0] = q.verticesId[0];
+    t1.verticesId[1] = q.verticesId[1];
+    t1.verticesId[2] = q.verticesId[2];
+
+    t2.verticesId[0] = q.verticesId[0];
+    t2.verticesId[1] = q.verticesId[2];
+    t2.verticesId[2] = q.verticesId[3];
+
+    if (q.texCordIdx[0] != -1) {
+        t1.texCordIdx[0] = q.texCordIdx[0];
+        t1.texCordIdx[1] = q.texCordIdx[1];
+        t1.texCordIdx[2] = q.texCordIdx[2];
+
+        t2.texCordIdx[0] = q.texCordIdx[0];
+        t2.texCordIdx[1] = q.texCordIdx[2];
+        t2.texCordIdx[2] = q.texCordIdx[3];
+    }
+
+    if (q.normalIdx[0] != -1) {
+        t1.normalIdx[0] = q.normalIdx[0];
+        t1.normalIdx[1] = q.normalIdx[1];
+        t1.normalIdx[2] = q.normalIdx[2];
+
+        t2.normalIdx[0] = q.normalIdx[0];
+        t2.normalIdx[1] = q.normalIdx[2];
+        t2.normalIdx[2] = q.normalIdx[3];
+    }
+}
+
+void Object3d::printObject() {
+    for (std::size_t i = 0; i < m_vertices.size(); i++) {
+        std::cout << "Vertex " << i+1 << ": ("
+                  << m_vertices[i].x << ", "
+                  << m_vertices[i].y << ", "
+                  << m_vertices[i].z << ")" << std::endl;
+    }
+
+    for (std::size_t i = 0; i < m_texcoords.size(); i++) {
+        std::cout << "TexCoord " << i+1 << ": ("
+                  << m_texcoords[i].u << ", "
+                  << m_texcoords[i].v << ")" << std::endl;
+    }
+
+    for (std::size_t i = 0; i < m_normals.size(); i++) {
+        std::cout << "Normal " << i+1 << ": ("
+                  << m_normals[i].nx << ", "
+                  << m_normals[i].ny << ", "
+                  << m_normals[i].nz << ")" << std::endl;
+    }
+
+    for (std::size_t i = 0; i < m_triangles.size(); i++) {
+        std::cout << "Triangle " << i+1 << ": vertices ["
+                  << m_triangles[i].verticesId[0] << ", "
+                  << m_triangles[i].verticesId[1] << ", "
+                  << m_triangles[i].verticesId[2] << "] texCoords ["
+                  << m_triangles[i].texCordIdx[0] << ", "
+                  << m_triangles[i].texCordIdx[1] << ", "
+                  << m_triangles[i].texCordIdx[2] << "] normals ["
+                  << m_triangles[i].normalIdx[0] << ", "
+                  << m_triangles[i].normalIdx[1] << ", "
+                  << m_triangles[i].normalIdx[2] << "]" << std::endl;
+    }
 }

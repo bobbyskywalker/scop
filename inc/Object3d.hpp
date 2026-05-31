@@ -5,6 +5,7 @@
 #include <vector>
 
 # define PARSER_ERROR_LOG "Exception occurred when parsing line "
+# define FACE_TOKEN_DELIMITER '/'
 
 enum class ObjType {
     VERTEX,
@@ -58,6 +59,12 @@ struct Triangle {
 	int normalIdx[3];
 };
 
+struct Quad {
+	int verticesId[4];
+	int texCordIdx[4];
+	int normalIdx[4];
+};
+
 class Object3d {
 public:
 	Object3d(std::string& filename);
@@ -73,6 +80,8 @@ public:
 
 	std::vector<Triangle> getTriangles() { return this->m_triangles; }
 
+	void printObject();
+
 private:
 	std::vector<Vertex>		m_vertices;
     std::vector<TexCoord>	m_texcoords;
@@ -84,8 +93,9 @@ private:
     void parseTexCoord(const std::vector<std::string>& tokens);
     void parseNormal(const std::vector<std::string>& tokens);
     void parseFace(const std::vector<std::string>& tokens);
-
-    void triangulateQuad(int v1, int v2, int v3);
+    template<typename T>
+    void parseFaceTokenIndices(T& shape, int pos, const std::string& indicesStr);
+    void triangulateQuad(Quad& q, Triangle& t1, Triangle& t2);
 
     void logInfo(const std::string& msg);
     void logError(int lineIdx, const std::string& errmsg);
