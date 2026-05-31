@@ -2,12 +2,12 @@
 #include "../inc/util.hpp"
 #include "../inc/exception/InvalidVertexParamsException.hpp"
 #include "../inc/exception/InvalidFaceParamsException.hpp"
+#include "../inc/exception/InvalidTexCoordParamsException.hpp"
+#include "../inc/exception/InvalidNormalParamsException.hpp"
 #include "../inc/exception/UnknownKeyInObjectFileException.hpp"
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <string>
-#include <vector>
 
 ObjType getType(const std::string& token) {
     if (token == "v") return ObjType::VERTEX;
@@ -22,7 +22,7 @@ ObjType getType(const std::string& token) {
     return ObjType::UNKNOWN;
 }
 
-Object3d::Object3d(std::string& filename) {
+Object3d::Object3d(const std::string& filename) {
 	loadObjFromFile(filename);
 }
 
@@ -38,7 +38,7 @@ void Object3d::logError(int lineIdx, const std::string& errmsg) {
 	logFile << PARSER_ERROR_LOG + std::to_string(lineIdx) << ": " << errmsg;
 }
 
-void Object3d::loadObjFromFile(std::string& filename) {
+void Object3d::loadObjFromFile(const std::string& filename) {
 	int idx = 1;
 	std::string line;
 	std::ifstream objFile(filename);
@@ -65,10 +65,12 @@ bool Object3d::parseLine(const int lineIdx, const std::string& line) {
 					logInfo("Successfully parsed vertex at line " + std::to_string(lineIdx) + "\n");
 					break;
 				case ObjType::TEXCOORD:
-					// parseTexCoord(tokens);
+					parseTexCoord(tokens);
+					logInfo("Successfully parsed texture coord at line " + std::to_string(lineIdx) + "\n");
 					break;
 				case ObjType::NORMAL:
-					// parseNormal(tokens);
+					parseNormal(tokens);
+					logInfo("Successfully normal at line " + std::to_string(lineIdx) + "\n");
 					break;
 				case ObjType::FACE:
 					parseFace(tokens);
@@ -99,7 +101,7 @@ bool Object3d::parseLine(const int lineIdx, const std::string& line) {
 
 void Object3d::parseVertex(const std::vector<std::string>& tokens) {
 	if (tokens.size() != 4) {
-		throw InvalidVertexParamsException("Invalid vertex definition: too many arguments.");
+		throw InvalidVertexParamsException("Invalid vertex definition: invalid number of arguments.");
 	}
 	auto v = Vertex(
 		std::stof(tokens[1]),
@@ -107,6 +109,29 @@ void Object3d::parseVertex(const std::vector<std::string>& tokens) {
 		std::stof(tokens[3])
 	);
 	this->m_vertices.push_back(v);
+}
+
+void Object3d::parseTexCoord(const std::vector<std::string>& tokens) {
+	if (tokens.size() != 3) {
+		throw InvalidTexCoordParamsException("Invalid texture definition: invalid number of arguments.");
+	}
+	auto tx = TexCoord(
+		std::stof(tokens[1]),
+		std::stof(tokens[2])
+	);
+	this->m_texcoords.push_back(tx);
+}
+
+void Object3d::parseNormal(const std::vector<std::string>& tokens) {
+	if (tokens.size() != 4 ) {
+		throw InvalidNormalParamsException("Invalid normal definition: invalid number of arguments.");
+	}
+	auto n = Normal(
+		std::stof(tokens[1]),
+		std::stof(tokens[2]),
+		std::stof(tokens[3])
+	);
+	this->m_normals.push_back(n);
 }
 
 /* The .obj file indexing starts from 1, which is super fucking dumb :)

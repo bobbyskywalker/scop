@@ -81,10 +81,10 @@ struct Quad {
 
 class Object3d {
 public:
-	Object3d(std::string& filename);
+	Object3d(const std::string& filename);
 	~Object3d();
 
-	void loadObjFromFile(std::string& filename);
+	void loadObjFromFile(const std::string& filename);
 
 	std::vector<Vertex> getVertices() { return this->m_vertices; }
 
