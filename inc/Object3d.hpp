@@ -57,12 +57,26 @@ struct Triangle {
 	int verticesId[3];
 	int texCordIdx[3];
 	int normalIdx[3];
+	Triangle() {
+        for (int i = 0; i < 3; i++) {
+            verticesId[i] = -1;
+            texCordIdx[i] = -1;
+            normalIdx[i] = -1;
+        }
+    }
 };
 
 struct Quad {
 	int verticesId[4];
 	int texCordIdx[4];
 	int normalIdx[4];
+	Quad() {
+        for (int i = 0; i < 4; i++) {
+            verticesId[i] = -1;
+            texCordIdx[i] = -1;
+            normalIdx[i] = -1;
+        }
+    }
 };
 
 class Object3d {
