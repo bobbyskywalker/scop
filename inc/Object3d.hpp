@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Material.hpp"
+#include <map>
 #include <string>
 #include <sys/types.h>
 #include <vector>
@@ -97,10 +99,11 @@ public:
 	void printObject();
 
 private:
-	std::vector<Vertex>		m_vertices;
-    std::vector<TexCoord>	m_texcoords;
-    std::vector<Normal>		m_normals;
-    std::vector<Triangle>	m_triangles;
+	std::vector<Vertex>             m_vertices;
+    std::vector<TexCoord>           m_texcoords;
+    std::vector<Normal>             m_normals;
+    std::vector<Triangle>           m_triangles;
+    std::map<std::string, Material> m_materials;
 
     bool parseLine(const int lineIdx, const std::string& line);
     void parseVertex(const std::vector<std::string>& tokens);
@@ -110,6 +113,7 @@ private:
     template<typename T>
     void parseFaceTokenIndices(T& shape, int pos, const std::string& indicesStr);
     void triangulateQuad(Quad& q, Triangle& t1, Triangle& t2);
+    void parseMaterials(const std::vector<std::string>& tokens);
 
     void logInfo(const std::string& msg);
     void logError(int lineIdx, const std::string& errmsg);

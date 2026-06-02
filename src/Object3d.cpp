@@ -1,11 +1,14 @@
 #include "../inc/Object3d.hpp"
+#include "../inc/MaterialLoader.hpp"
 #include "../inc/util.hpp"
 #include "../inc/exception/InvalidVertexParamsException.hpp"
 #include "../inc/exception/InvalidFaceParamsException.hpp"
 #include "../inc/exception/InvalidTexCoordParamsException.hpp"
 #include "../inc/exception/InvalidNormalParamsException.hpp"
 #include "../inc/exception/UnknownKeyInObjectFileException.hpp"
+#include "../inc/exception/InvalidMtlLibParamsException.hpp"
 #include <cstdlib>
+#include <exception>
 #include <fstream>
 #include <iostream>
 
@@ -79,6 +82,8 @@ bool Object3d::parseLine(const int lineIdx, const std::string& line) {
 				case ObjType::COMMENT:
 					break;
 				case ObjType::MTL_LIB:
+                    parseMaterials(tokens);
+                    logInfo("Successfully parsed material library at line " + std::to_string(lineIdx) + "\n");
 					break;
 				case ObjType::USE_MTL:
 					break;
@@ -206,6 +211,14 @@ void Object3d::triangulateQuad(Quad& q, Triangle& t1, Triangle& t2) {
         t2.normalIdx[1] = q.normalIdx[2];
         t2.normalIdx[2] = q.normalIdx[3];
     }
+}
+
+void Object3d::parseMaterials(const std::vector<std::string>& tokens) {
+    if (tokens.size() != 2) {
+        throw InvalidMtlLibParamsException("Invalid material library definition. Invalid number of arguments.");
+    }
+    auto materials = MaterialLoader::parseMaterials(tokens.at(1));
+    m_materials = materials;
 }
 
 void Object3d::printObject() {
