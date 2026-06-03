@@ -1,6 +1,11 @@
 #include "../inc/MaterialLoader.hpp"
 #include "../inc/util.hpp"
 #include "../inc/exception/UnknownKeyInObjectFileException.hpp"
+#include "../inc/exception/InvalidColorParamsException.hpp"
+#include "../inc/exception/FileUnprocessableException.hpp"
+#include "../inc/exception/MalformedMaterialFileDeclarationException.hpp"
+#include <cstddef>
+#include <exception>
 #include <fstream>
 #include <iostream>
 
@@ -42,8 +47,7 @@ void MaterialLoader::logError(int lineIdx, const std::string& errmsg) {
 }
 
 std::unordered_map<std::string, Material>
-MaterialLoader::parseMaterials(const std::string &filename)
-{
+MaterialLoader::parseMaterials(const std::string &filename) {
     int idx = 1;
     std::string line;
     std::ifstream mtlFile(filename);
@@ -53,19 +57,18 @@ MaterialLoader::parseMaterials(const std::string &filename)
     std::string currentName;
     Material currentMaterial;
 
-    if (mtlFile.is_open())
-    {
-        while (std::getline(mtlFile, line))
-        {
-            if (!parseLine(idx++, line, materials, currentName, currentMaterial))
-                break;
+    if (mtlFile.is_open()) {
+        while (std::getline(mtlFile, line)) {
+            if (!parseLine(idx++, line, materials, currentName, currentMaterial)) {
+                mtlFile.close();
+                throw MalformedMaterialFileDeclarationException("Error: Unable to parse material file.");
+            }
         }
         mtlFile.close();
     }
-    else
-    {
-        std::cerr << "Error: failed to open file " << filename << std::endl;
+    else {
         logError(0, "Failed to open file.");
+        throw FileUnprocessableException("Failed to open material library file.");
     }
 
     if (!currentName.empty())
@@ -82,44 +85,54 @@ bool MaterialLoader::parseLine(
     Material& currentMaterial
 ) {
     try {
-        if (line.empty())
-            return true;
+        if (!line.empty()) {
+            std::vector<std::string> tokens = split(line, ' ');
+            MtlType type = getMtlTokenType(tokens.at(0));
 
-        std::vector<std::string> tokens = split(line, ' ');
-        MtlType type = getMtlTokenType(tokens.at(0));
+            switch (type) {
+                case MtlType::NEW_MATERIAL:
+                    if (!currentName.empty())
+                        materials[currentName] = currentMaterial;
 
-        switch (type) {
-            case MtlType::NEW_MATERIAL:
-                if (!currentName.empty())
-                    materials[currentName] = currentMaterial;
+                    currentName = tokens.at(1);
+                    currentMaterial = Material();
+                    logInfo("Starting to parse material named: " + currentName);
+                    break;
 
-                currentName = tokens.at(1);
-                currentMaterial = Material();
-                break;
+                case MtlType::DIFFUSE_COLOR:
+                    parseColor(tokens, currentMaterial);
+                    logInfo("Successfuly parsed diffuse color at line " + std::to_string(lineIdx) + "\n");
+                    break;
 
-            case MtlType::DIFFUSE_COLOR:
-                parseColor(lineIdx, tokens, currentMaterial);
-                break;
+                case MtlType::DIFFUSE_MAP:
+                    currentMaterial.setDiffuseMap(tokens.at(1));
+                    logInfo("Successfuly diffuse texture map at line " + std::to_string(lineIdx) + "\n");
+                    break;
 
-            case MtlType::DIFFUSE_MAP:
-                currentMaterial.setDiffuseMap(tokens.at(1));
-                break;
-
-            case MtlType::UNKNOWN:
-                throw UnknownKeyInObjectFileException(
-                    "Unknown key: " + tokens.at(0)
-                );
-
-            default:
-                break;
+                case MtlType::UNKNOWN:
+                    throw UnknownKeyInObjectFileException("Unknown key: " + tokens.at(0));
+                default:
+                    break;
+            }
         }
     }
-    catch (const std::exception& e)
-    {
+    catch (const std::exception& e) {
         std::cerr << "[Line " << lineIdx << "]: " << e.what() << std::endl;
         logError(lineIdx, e.what());
         return false;
     }
-
     return true;
+}
+
+void MaterialLoader::parseColor(
+    const std::vector<std::string>& tokens,
+    Material& currentMaterial
+) {
+    if (tokens.size() != 4) {
+        throw InvalidColorParamsException("Invalid color definition. Invalid number of arguments.");
+    }
+    auto r = std::stof(tokens[1]);
+    auto g = std::stof(tokens[2]);
+    auto b = std::stof(tokens[3]);
+    currentMaterial.setDiffuseColor(std::vector<float>{r, g, b});
 }

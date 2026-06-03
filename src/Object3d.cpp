@@ -48,8 +48,9 @@ void Object3d::loadObjFromFile(const std::string& filename) {
 
 	if (objFile.is_open()) {
 		while(std::getline(objFile, line)) {
-			if (!parseLine(idx++, line))
+			if (!parseLine(idx++, line)) {
 				break;
+			}
 		}
 		objFile.close();
 	} else {
@@ -97,7 +98,7 @@ bool Object3d::parseLine(const int lineIdx, const std::string& line) {
 			}
 		}
 	} catch (const std::exception& e) {
-	    std::cerr << "[Line " << lineIdx << "]: " << e.what() << std::endl;
+	    std::cerr << "ERROR [Line " << lineIdx << "]: " << e.what() << std::endl;
 	    logError(lineIdx, e.what());
 	    return false;
 	}

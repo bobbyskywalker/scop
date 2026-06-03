@@ -7,13 +7,11 @@ public:
     Material(): diffuseMap(""), diffuseColor({}){}
     ~Material() {}
 
-    void setDiffuseMap(std::string diffuseMap) {
-        this->diffuseMap = diffuseMap;
-    }
+    std::string getDiffuseMap() { return this->diffuseMap; }
+    void setDiffuseMap(std::string diffuseMap) { this->diffuseMap = diffuseMap; }
 
-    void setDiffuseColor(std::vector<float> diffuseColor) {
-        this->diffuseColor = diffuseColor;
-    }
+    std::vector<float> getDiffuseColor() { return this->diffuseColor; };
+    void setDiffuseColor(std::vector<float> diffuseColor) { this->diffuseColor = diffuseColor; }
 
 private:
     std::string         diffuseMap;

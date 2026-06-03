@@ -53,7 +53,6 @@ private:
     );
 
     static void parseColor(
-        const int lineIdx,
         const std::vector<std::string>& tokens,
         Material& currentMaterial
     );
