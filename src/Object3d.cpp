@@ -32,12 +32,12 @@ Object3d::Object3d(const std::string& filename) {
 Object3d::~Object3d() {}
 
 void Object3d::logInfo(const std::string& msg) {
-	static std::ofstream logFile("debug.log");
+	static std::ofstream logFile("debug_obj.log");
     logFile << msg << std::endl;
 }
 
 void Object3d::logError(int lineIdx, const std::string& errmsg) {
-	static std::ofstream logFile("debug.log");
+	static std::ofstream logFile("debug_obj.log");
 	logFile << PARSER_ERROR_LOG + std::to_string(lineIdx) << ": " << errmsg;
 }
 

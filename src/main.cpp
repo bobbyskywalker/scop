@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include "../inc/Object3d.hpp"
+#include "../inc/Window.hpp"
 
 int main(int ac, char **av) {
 	if (ac != 2) {
@@ -10,4 +11,6 @@ int main(int ac, char **av) {
 	}
 	std::string inputFilename = av[1];
 	Object3d obj = Object3d(inputFilename);
+	Window window = Window();
+	window.run();
 }

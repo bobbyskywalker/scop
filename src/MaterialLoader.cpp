@@ -4,7 +4,6 @@
 #include "../inc/exception/InvalidColorParamsException.hpp"
 #include "../inc/exception/FileUnprocessableException.hpp"
 #include "../inc/exception/MalformedMaterialFileDeclarationException.hpp"
-#include <cstddef>
 #include <exception>
 #include <fstream>
 #include <iostream>
