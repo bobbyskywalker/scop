@@ -4,9 +4,18 @@
 
 class Material {
 public:
-    Material() {}
+    Material(): diffuseMap(""), diffuseColor({}){}
     ~Material() {}
+
+    void setDiffuseMap(std::string diffuseMap) {
+        this->diffuseMap = diffuseMap;
+    }
+
+    void setDiffuseColor(std::vector<float> diffuseColor) {
+        this->diffuseColor = diffuseColor;
+    }
+
 private:
-    std::string         textureMap;
+    std::string         diffuseMap;
     std::vector<float>  diffuseColor;
 };

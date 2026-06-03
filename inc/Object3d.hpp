@@ -1,12 +1,11 @@
 #pragma once
 
 #include "Material.hpp"
-#include <map>
 #include <string>
 #include <sys/types.h>
+#include <unordered_map>
 #include <vector>
 
-# define PARSER_ERROR_LOG "Exception occurred when parsing line "
 # define FACE_TOKEN_DELIMITER '/'
 
 enum class ObjType {
@@ -22,7 +21,7 @@ enum class ObjType {
     UNKNOWN
 };
 
-ObjType getType(const std::string& token);
+ObjType getObjTokenType(const std::string& token);
 
 /*
   --- .obj file legend ---
@@ -103,7 +102,7 @@ private:
     std::vector<TexCoord>           m_texcoords;
     std::vector<Normal>             m_normals;
     std::vector<Triangle>           m_triangles;
-    std::map<std::string, Material> m_materials;
+    std::unordered_map<std::string, Material> m_materials;
 
     bool parseLine(const int lineIdx, const std::string& line);
     void parseVertex(const std::vector<std::string>& tokens);

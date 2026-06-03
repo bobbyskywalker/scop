@@ -12,7 +12,7 @@
 #include <fstream>
 #include <iostream>
 
-ObjType getType(const std::string& token) {
+ObjType getObjTokenType(const std::string& token) {
     if (token == "v") return ObjType::VERTEX;
     if (token == "vt") return ObjType::TEXCOORD;
     if (token == "vn") return ObjType::NORMAL;
@@ -62,7 +62,7 @@ bool Object3d::parseLine(const int lineIdx, const std::string& line) {
 	try {
 		if (!line.empty()) {
 			std::vector<std::string> tokens = split(line, ' ');
-			switch (getType(tokens.at(0))) {
+			switch (getObjTokenType(tokens.at(0))) {
 				case ObjType::VERTEX:
 					parseVertex(tokens);
 					logInfo("Successfully parsed vertex at line " + std::to_string(lineIdx) + "\n");
