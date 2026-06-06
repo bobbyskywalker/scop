@@ -1,10 +1,7 @@
 #include "../inc/glad/glad.h"
 #include "GLFW/glfw3.h"
-#include "../inc/Window.hpp"
+#include "../inc/graphics/Window.hpp"
 #include <iostream>
-
-#define WINDOW_WIDTH 640
-#define WINDOW_HEIGHT 480
 
 // todo: window resizing
 

@@ -1,5 +1,5 @@
-#include "../inc/Object3d.hpp"
-#include "../inc/MaterialLoader.hpp"
+#include "../inc/model/Object3d.hpp"
+#include "../inc/model/MaterialLoader.hpp"
 #include "../inc/util.hpp"
 #include "../inc/exception/InvalidVertexParamsException.hpp"
 #include "../inc/exception/InvalidFaceParamsException.hpp"

@@ -1,4 +1,4 @@
-#include "../inc/math3d.h"
+#include "../inc/math/math3d.h"
 #include <math.h>
 
 mat4 mat_identity() {

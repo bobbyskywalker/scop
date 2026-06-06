@@ -1,4 +1,4 @@
-#include "../inc/MaterialLoader.hpp"
+#include "../inc/model/MaterialLoader.hpp"
 #include "../inc/util.hpp"
 #include "../inc/exception/UnknownKeyInObjectFileException.hpp"
 #include "../inc/exception/InvalidColorParamsException.hpp"
