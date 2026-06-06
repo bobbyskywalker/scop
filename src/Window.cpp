@@ -6,6 +6,8 @@
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480
 
+// todo: window resizing
+
 Window::Window() {
 	if (!glfwInit()) {
 		std::cerr << "Error: GLFW initialization failure" << std::endl;
@@ -23,7 +25,7 @@ Window::Window() {
         std::cerr << "Error: GLAD initialization failure" << std::endl;
         std::exit(1);
     }
-
+	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 
 Window::~Window() {}
@@ -31,15 +33,22 @@ Window::~Window() {}
 void Window::run() {
 	while (!glfwWindowShouldClose(m_window)) {
 		/* todo:
-		* Process events
-		* Clear screen - wipe previous frame
 		* Update transformations - move/rotate object based on input
-		* Draw
-		* Swap buffers
 		*/
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		/* ^^^ test - bg color render */
+
+		processInput();
+		glfwSwapBuffers(m_window);
 		glfwPollEvents();
 	}
 	cleanGlfw();
+}
+
+void Window::processInput() {
+	if(glfwGetKey(this->m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(this->m_window, true);
 }
 
 void Window::error_callback(int error, const char* description) {

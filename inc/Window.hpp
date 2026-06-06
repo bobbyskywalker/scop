@@ -8,6 +8,7 @@ public:
 	~Window();
 
 	void run();
+	void processInput();
 
 	static void error_callback(int error, const char* description);
 

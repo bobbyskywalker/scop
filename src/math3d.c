@@ -86,7 +86,7 @@ mat4 mat_multiply(mat4 a, mat4 b) {
 }
 
 vec4 mat_vec_multiply(mat4 m, vec4 v) {
-    vec4 res = {0};
+    vec4 res = {};
     res.x = m.matrix[0][0]*v.x + m.matrix[0][1]*v.y + m.matrix[0][2]*v.z + m.matrix[0][3]*v.w;
     res.y = m.matrix[1][0]*v.x + m.matrix[1][1]*v.y + m.matrix[1][2]*v.z + m.matrix[1][3]*v.w;
     res.z = m.matrix[2][0]*v.x + m.matrix[2][1]*v.y + m.matrix[2][2]*v.z + m.matrix[2][3]*v.w;
