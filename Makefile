@@ -11,7 +11,11 @@ GLFW_DIR = $(LIB_DIR)/glfw
 GLFW_BUILD = $(GLFW_DIR)/build
 
 SRC = $(shell find $(SRC_DIR) -type f -name "*.cpp")
-OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRC))
+C_SRC = $(shell find $(SRC_DIR) -type f -name "*.c")
+ALL_SRC = $(SRC) $(C_SRC)
+
+OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRC)) \
+       $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(C_SRC))
 
 LIBS = -lGL -lX11 -lXrandr -lXinerama -lXcursor -lXi -ldl -lpthread
 
@@ -29,6 +33,10 @@ configure:
 		cd $(GLFW_BUILD) && cmake .. -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_WAYLAND=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF; \
 	fi
 	$(MAKE) -C $(GLFW_BUILD)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CPPFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(dir $@)

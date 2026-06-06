@@ -1,5 +1,6 @@
-#include "../inc/Window.hpp"
+#include "../inc/glad/glad.h"
 #include "GLFW/glfw3.h"
+#include "../inc/Window.hpp"
 #include <iostream>
 
 #define WINDOW_WIDTH 640
@@ -17,6 +18,12 @@ Window::Window() {
 		std::exit(1);
 	}
 	glfwMakeContextCurrent(this->m_window);
+
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        std::cerr << "Error: GLAD initialization failure" << std::endl;
+        std::exit(1);
+    }
+
 }
 
 Window::~Window() {}
