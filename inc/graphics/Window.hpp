@@ -1,16 +1,23 @@
 #pragma once
 
 #include <GLFW/glfw3.h>
+#include "../model/Object3d.hpp"
 
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480
+
+#define BASE_SHADER_LOCATION "./src/graphics/shaders/"
+
+enum class ShaderLoadable {
+    BASIC_VERT
+};
 
 class Window {
 public:
 	Window();
 	~Window();
 
-	void run();
+	void run(Object3d renderable);
 	void processInput();
 
 	static void error_callback(int error, const char* description);
@@ -21,5 +28,6 @@ private:
 	GLFWwindow* m_window;
 
 	void cleanGlfw();
+	std::string loadShader(ShaderLoadable shader);
 
 };

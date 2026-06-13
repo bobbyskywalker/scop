@@ -1,0 +1,2 @@
+CompileFlags:
+  Add: [-Ilibs/glfw/include, -Iinc, -Isrc, -I.]

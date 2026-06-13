@@ -1,9 +1,9 @@
-#include "../inc/model/MaterialLoader.hpp"
-#include "../inc/util.hpp"
-#include "../inc/exception/UnknownKeyInObjectFileException.hpp"
-#include "../inc/exception/InvalidColorParamsException.hpp"
-#include "../inc/exception/FileUnprocessableException.hpp"
-#include "../inc/exception/MalformedMaterialFileDeclarationException.hpp"
+#include "../../inc/model/MaterialLoader.hpp"
+#include "../../inc/util.hpp"
+#include "../../inc/exception/UnknownKeyInObjectFileException.hpp"
+#include "../../inc/exception/InvalidColorParamsException.hpp"
+#include "../../inc/exception/FileUnprocessableException.hpp"
+#include "../../inc/exception/MalformedMaterialFileDeclarationException.hpp"
 #include <exception>
 #include <fstream>
 #include <iostream>

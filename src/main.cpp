@@ -12,5 +12,5 @@ int main(int ac, char **av) {
 	std::string inputFilename = av[1];
 	Object3d obj = Object3d(inputFilename);
 	Window window = Window();
-	window.run();
+	window.run(obj);
 }
