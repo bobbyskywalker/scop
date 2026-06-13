@@ -52,13 +52,15 @@ void Window::initEngine(Object3d& renderable) {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(renderable.getVertices()), renderable.getVertices().data(), GL_STATIC_DRAW);
 
 	/* shader compilation */
-	unsigned int vertexShader;
-	unsigned int fragmentShader;
-	vertexShader = compileShader(ShaderLoadable::BASIC_VERT, GL_VERTEX_SHADER);
-	fragmentShader = compileShader(ShaderLoadable::BASIC_FRAG, GL_FRAGMENT_SHADER);
+	unsigned int vertexShader = compileShader(ShaderLoadable::BASIC_VERT, GL_VERTEX_SHADER);
+	unsigned int fragmentShader = compileShader(ShaderLoadable::BASIC_FRAG, GL_FRAGMENT_SHADER);
 
 	/* shader linking */
-	linkShaders(vertexShader, fragmentShader);
+	unsigned int shaderProgram = linkShaders(vertexShader, fragmentShader);
+	glUseProgram(shaderProgram);
+
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
 }
 
 void Window::run(Object3d& renderable) {
@@ -123,8 +125,8 @@ unsigned int Window::compileShader(ShaderLoadable shaderFile, int shaderMacro) {
 }
 
 /* accepts a variable number of compiled shaders */
-void Window::linkShaders(unsigned int shader, ...) {
-    auto shaderProgram = glCreateProgram();
+unsigned int Window::linkShaders(unsigned int shader, ...) {
+    unsigned int shaderProgram = glCreateProgram();
 
     va_list args;
     va_start(args, shader);
@@ -145,4 +147,6 @@ void Window::linkShaders(unsigned int shader, ...) {
         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
         throw ShaderLinkingErrorException("ERROR::SHADER::PROGRAM::LINKING_FAILED\n" + std::string(infoLog));
     }
+
+    return shaderProgram;
 }

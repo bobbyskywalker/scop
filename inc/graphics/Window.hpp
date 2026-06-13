@@ -30,7 +30,7 @@ private:
 
 	void cleanGlfw();
 	void processInput();
-	void linkShaders(unsigned int shaders...);
+	unsigned int linkShaders(unsigned int shaders...);
 	unsigned int compileShader(ShaderLoadable shaderFile, int shaderType);
 	std::string loadShader(ShaderLoadable shader);
 
