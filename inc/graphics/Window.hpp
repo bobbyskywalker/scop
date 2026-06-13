@@ -9,7 +9,8 @@
 #define BASE_SHADER_LOCATION "./src/graphics/shaders/"
 
 enum class ShaderLoadable {
-    BASIC_VERT
+    BASIC_VERT,
+    BASIC_FRAG
 };
 
 class Window {
@@ -17,8 +18,8 @@ public:
 	Window();
 	~Window();
 
-	void run(Object3d renderable);
-	void processInput();
+	void initEngine(Object3d& renderable);
+	void run(Object3d& renderable);
 
 	static void error_callback(int error, const char* description);
 
@@ -28,6 +29,8 @@ private:
 	GLFWwindow* m_window;
 
 	void cleanGlfw();
-	std::string loadShader(ShaderLoadable shader);
+	void processInput();
+	unsigned int compileShader(ShaderLoadable shaderFile, int shaderType);
+	std::string loadShader( ShaderLoadable shader);
 
 };

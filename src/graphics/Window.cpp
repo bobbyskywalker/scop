@@ -2,7 +2,9 @@
 #include "GLFW/glfw3.h"
 #include "../../inc/graphics/Window.hpp"
 #include "../../inc/exception/MissingShaderFileException.hpp"
+#include "../../inc/exception/ShaderCompilationException.hpp"
 #include <GL/glext.h>
+#include <cmath>
 #include <cstddef>
 #include <iostream>
 #include <fstream>
@@ -10,6 +12,8 @@
 const std::string getShaderFilename(ShaderLoadable shader) {
     if (shader == ShaderLoadable::BASIC_VERT) {
         return std::string(BASE_SHADER_LOCATION) + "basic_vert.glsl";
+    } else if (shader == ShaderLoadable::BASIC_FRAG) {
+        return std::string(BASE_SHADER_LOCATION) + "basic_frag.glsl";
     }
     return "";
 }
@@ -38,39 +42,29 @@ Window::Window() {
 
 Window::~Window() {}
 
-void Window::run(Object3d renderable) {
+void Window::initEngine(Object3d& renderable) {
+    /* vertex buffer init */
+    unsigned int VBO;
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(renderable.getVertices()), renderable.getVertices().data(), GL_STATIC_DRAW);
+
+	/* shader compilation */
+	unsigned int vertexShader;
+	unsigned int fragmentShader;
+	vertexShader = compileShader(ShaderLoadable::BASIC_VERT, GL_VERTEX_SHADER);
+	fragmentShader = compileShader(ShaderLoadable::BASIC_FRAG, GL_FRAGMENT_SHADER);
+
+	/* shader linking */
+	unsigned int shaderProgram = glCreateProgram();
+	glAttachShader(shaderProgram, vertexShader);
+	glAttachShader(shaderProgram, fragmentShader);
+	glLinkProgram(shaderProgram);
+}
+
+void Window::run(Object3d& renderable) {
+    (void) renderable;
 	while (!glfwWindowShouldClose(m_window)) {
-		// step 1: vertex input
-		unsigned int VBO;
-		glGenBuffers(1, &VBO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(renderable.getVertices()), renderable.getVertices().data(), GL_STATIC_DRAW);
-
-		// step 2: vertex shader
-		unsigned int vertexShader;
-		std::string shaderSrcStr;
-		const char *shaderSrc;
-		try {
-		    shaderSrcStr = loadShader(ShaderLoadable::BASIC_VERT);
-			shaderSrc = shaderSrcStr.c_str();
-		} catch (const std::exception& e) {
-		    std::cerr << "Error: failed to load shader source. Reason: " << e.what() << std::endl;
-			break;
-		}
-		vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vertexShader, 1, &shaderSrc, NULL);
-		glCompileShader(vertexShader);
-
-		int  success;
-		char infoLog[512];
-		glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-		if (!success) {
-            glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-            std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-		}
-
-		/* ^^^ test - bg color render */
-
 		processInput();
 		glfwSwapBuffers(m_window);
 		glfwPollEvents();
@@ -106,4 +100,25 @@ std::string Window::loadShader(ShaderLoadable shader) {
         content += line + "\n";
     }
     return content;
+}
+
+unsigned int Window::compileShader(ShaderLoadable shaderFile, int shaderMacro) {
+    unsigned int shader;
+	std::string shaderSrcStr;
+	const char *shaderSrc;
+
+	shaderSrcStr = loadShader(shaderFile);
+	shaderSrc = shaderSrcStr.c_str();
+	shader = glCreateShader(shaderMacro);
+	glShaderSource(shader, 1, &shaderSrc, NULL);
+	glCompileShader(shader);
+
+	int  success;
+	char infoLog[512];
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+	if (!success) {
+        glGetShaderInfoLog(shader, 512, NULL, infoLog);
+        throw ShaderCompilationException("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" + std::string(infoLog));
+	}
+	return shader;
 }
