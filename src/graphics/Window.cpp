@@ -3,8 +3,10 @@
 #include "../../inc/graphics/Window.hpp"
 #include "../../inc/exception/MissingShaderFileException.hpp"
 #include "../../inc/exception/ShaderCompilationException.hpp"
+#include "../../inc/exception/ShaderLinkingErrorException.hpp"
 #include <GL/glext.h>
 #include <cmath>
+#include <cstdarg>
 #include <cstddef>
 #include <iostream>
 #include <fstream>
@@ -56,10 +58,7 @@ void Window::initEngine(Object3d& renderable) {
 	fragmentShader = compileShader(ShaderLoadable::BASIC_FRAG, GL_FRAGMENT_SHADER);
 
 	/* shader linking */
-	unsigned int shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
+	linkShaders(vertexShader, fragmentShader);
 }
 
 void Window::run(Object3d& renderable) {
@@ -121,4 +120,29 @@ unsigned int Window::compileShader(ShaderLoadable shaderFile, int shaderMacro) {
         throw ShaderCompilationException("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" + std::string(infoLog));
 	}
 	return shader;
+}
+
+/* accepts a variable number of compiled shaders */
+void Window::linkShaders(unsigned int shader, ...) {
+    auto shaderProgram = glCreateProgram();
+
+    va_list args;
+    va_start(args, shader);
+    glAttachShader(shaderProgram, shader);
+    while (true) {
+        GLuint shader = va_arg(args, GLuint);
+        if (shader == 0) break;
+        glAttachShader(shaderProgram, shader);
+    }
+    va_end(args);
+
+    glLinkProgram(shaderProgram);
+
+    int  success;
+	char infoLog[512];
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        throw ShaderLinkingErrorException("ERROR::SHADER::PROGRAM::LINKING_FAILED\n" + std::string(infoLog));
+    }
 }
