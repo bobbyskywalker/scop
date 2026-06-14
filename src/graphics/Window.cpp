@@ -1,7 +1,6 @@
 #include "../../inc/glad/glad.h"
 #include "../../inc/graphics/Window.hpp"
 #include "../../inc/graphics/engine/OpenGLEngine.hpp"
-#include "../../inc/math/math3d.h"
 #include "GLFW/glfw3.h"
 #include <cmath>
 #include <cstddef>
@@ -31,15 +30,9 @@ Window::Window(Object3d& renderable) : m_renderable(renderable), m_engine(nullpt
 
 Window::~Window() {}
 
-void Window::run(Object3d& renderable) {
-    float aspect = (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT;
-    mat4 proj = perspective(45.0f, aspect, 0.1f, 100.0f);
-    mat4 view = translate({0.0f, 0.0f, -5.0f});
-    mat4 model = mat_identity();
-    mat4 mvp = mat_multiply(proj, mat_multiply(view, model));
-
+void Window::run() {
     while (!glfwWindowShouldClose(m_window)) {
-   		this->m_engine->render(renderable, mvp);
+   		this->m_engine->render(this->m_renderable);
         processInput();
         glfwSwapBuffers(m_window);
         glfwPollEvents();

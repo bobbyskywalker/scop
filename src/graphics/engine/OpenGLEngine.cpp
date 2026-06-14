@@ -23,9 +23,7 @@ OpenGlEngine::OpenGlEngine(Object3d& renderable) {
     m_shaderProgram = linkShaders(vertexShader, fragmentShader, 0);
     glUseProgram(m_shaderProgram);
 
-    m_mvpLocation = glGetUniformLocation(m_shaderProgram, "u_mvp");
-
-    /* VAO/VBO setup */
+    /* VAO/VBO/EBO setup */
     glGenVertexArrays(1, &m_VAO);
     glBindVertexArray(m_VAO);
 
@@ -36,7 +34,17 @@ OpenGlEngine::OpenGlEngine(Object3d& renderable) {
     glBufferData(GL_ARRAY_BUFFER,
                  vertices.size() * sizeof(float),
                  vertices.data(),
-                 GL_STATIC_DRAW);
+                 GL_STATIC_DRAW
+    );
+
+    auto indices = renderable.getIndices();
+    glGenBuffers(1, &m_EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+    			indices.size() * sizeof(unsigned int),
+       			indices.data(),
+          		GL_STATIC_DRAW
+    );
 
     /* link vertex attributes */
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -50,16 +58,14 @@ OpenGlEngine::OpenGlEngine(Object3d& renderable) {
 
 OpenGlEngine::~OpenGlEngine() {}
 
-void OpenGlEngine::render(Object3d& renderable, const mat4& mvp) {
+void OpenGlEngine::render(Object3d& renderable) {
    	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(m_shaderProgram);
-    glUniformMatrix4fv(m_mvpLocation, 1, GL_FALSE, &mvp.matrix[0][0]);
     glBindVertexArray(m_VAO);
 
-    int vertexCount = renderable.getVertices().size();
-    glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+    glDrawElements(GL_TRIANGLES, renderable.getIndices().size(), GL_UNSIGNED_INT, 0);
 }
 
 std::string OpenGlEngine::loadShader(ShaderLoadable shader) {

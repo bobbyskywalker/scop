@@ -13,7 +13,7 @@ public:
 	~Window();
 
 	void initEngine(Object3d& renderable);
-	void run(Object3d& renderable);
+	void run();
 
 	static void error_callback(int error, const char* description);
 

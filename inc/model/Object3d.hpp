@@ -105,6 +105,16 @@ public:
 
 	std::vector<Triangle> getTriangles() { return this->m_triangles; }
 
+	std::vector<unsigned int> getIndices() const {
+	    std::vector<unsigned int> idx;
+	    for (const auto& tri : m_triangles) {
+	        idx.push_back(tri.verticesId[0]);
+	        idx.push_back(tri.verticesId[1]);
+	        idx.push_back(tri.verticesId[2]);
+	    }
+	    return idx;
+	}
+
 	void printObject();
 
 private:

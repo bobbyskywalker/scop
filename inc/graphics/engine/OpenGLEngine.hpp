@@ -16,13 +16,13 @@ public:
 	OpenGlEngine(Object3d &renderable);
 	~OpenGlEngine() override;
 
-	void render(Object3d& renderable, const mat4& mvp) override;
+	void render(Object3d& renderable) override;
 
 private:
 	unsigned int m_shaderProgram;
 	unsigned int m_VAO;
 	unsigned int m_VBO;
-	unsigned int m_mvpLocation;
+	unsigned int m_EBO;
 
 	unsigned int 	linkShaders(unsigned int shaders...);
 	unsigned int 	compileShader(ShaderLoadable shaderFile, int shaderType);

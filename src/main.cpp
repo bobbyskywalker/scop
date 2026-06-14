@@ -13,7 +13,7 @@ int main(int ac, char **av) {
 	Object3d obj = Object3d(inputFilename);
 	try {
 		Window window = Window(obj);
-		window.run(obj);
+		window.run();
 	} catch (const std::exception& e) {
 	    std::cerr << "Fatal renderer error. Reason: " << e.what() << std::endl;
 		std::exit(1);
