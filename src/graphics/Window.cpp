@@ -1,9 +1,10 @@
 #include "../../inc/glad/glad.h"
-#include "GLFW/glfw3.h"
 #include "../../inc/graphics/Window.hpp"
+#include "../../inc/math/math3d.h"
 #include "../../inc/exception/MissingShaderFileException.hpp"
 #include "../../inc/exception/ShaderCompilationException.hpp"
 #include "../../inc/exception/ShaderLinkingErrorException.hpp"
+#include "GLFW/glfw3.h"
 #include <GL/glext.h>
 #include <cmath>
 #include <cstdarg>
@@ -21,7 +22,6 @@ const std::string getShaderFilename(ShaderLoadable shader) {
 }
 
 // todo: window resizing
-
 Window::Window() {
 	if (!glfwInit()) {
 		std::cerr << "Error: GLFW initialization failure" << std::endl;
@@ -45,32 +45,71 @@ Window::Window() {
 Window::~Window() {}
 
 void Window::initEngine(Object3d& renderable) {
-    /* vertex buffer init */
-    unsigned int VBO;
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(renderable.getVertices()), renderable.getVertices().data(), GL_STATIC_DRAW);
+	/* compile shaders */
+    unsigned int vertexShader = compileShader(ShaderLoadable::BASIC_VERT, GL_VERTEX_SHADER);
+    unsigned int fragmentShader = compileShader(ShaderLoadable::BASIC_FRAG, GL_FRAGMENT_SHADER);
 
-	/* shader compilation */
-	unsigned int vertexShader = compileShader(ShaderLoadable::BASIC_VERT, GL_VERTEX_SHADER);
-	unsigned int fragmentShader = compileShader(ShaderLoadable::BASIC_FRAG, GL_FRAGMENT_SHADER);
+    m_shaderProgram = linkShaders(vertexShader, fragmentShader);
+    glUseProgram(m_shaderProgram);
 
-	/* shader linking */
-	unsigned int shaderProgram = linkShaders(vertexShader, fragmentShader);
-	glUseProgram(shaderProgram);
+    m_mvpLocation = glGetUniformLocation(m_shaderProgram, "u_mvp");
 
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+    /* VAO/VBO setup */
+    glGenVertexArrays(1, &m_VAO);
+    glBindVertexArray(m_VAO);
+
+    glGenBuffers(1, &m_VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+
+    // In Window::initEngine, flatten the vertices
+    std::vector<float> vertexData;
+    for (const auto& v : renderable.getVertices()) {
+        vertexData.push_back(v.x);
+        vertexData.push_back(v.y);
+        vertexData.push_back(v.z);
+    }
+
+    glBufferData(GL_ARRAY_BUFFER,
+                 vertexData.size() * sizeof(float),
+                 vertexData.data(),
+                 GL_STATIC_DRAW);
+
+    /* link vertex attributes */
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    /* cleanup */
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+    glBindVertexArray(0);
 }
 
 void Window::run(Object3d& renderable) {
-    (void) renderable;
-	while (!glfwWindowShouldClose(m_window)) {
-		processInput();
-		glfwSwapBuffers(m_window);
-		glfwPollEvents();
-	}
-	cleanGlfw();
+    float aspect = (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT;
+    mat4 proj = perspective(45.0f, aspect, 0.1f, 100.0f);
+    mat4 view = translate({0.0f, 0.0f, -5.0f});
+    mat4 model = mat_identity();
+    mat4 mvp = mat_multiply(proj, mat_multiply(view, model));
+
+    while (!glfwWindowShouldClose(m_window)) {
+    // Add before drawing
+    	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // Use shader and VAO
+        glUseProgram(m_shaderProgram);
+        glUniformMatrix4fv(m_mvpLocation, 1, GL_FALSE, &mvp.matrix[0][0]);
+        glBindVertexArray(m_VAO);
+
+        // Draw all triangles
+        int vertexCount = renderable.getVertices().size();
+        glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+
+        processInput();
+        glfwSwapBuffers(m_window);
+        glfwPollEvents();
+    }
+    cleanGlfw();
 }
 
 void Window::processInput() {
