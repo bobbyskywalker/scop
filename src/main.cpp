@@ -11,12 +11,11 @@ int main(int ac, char **av) {
 	}
 	std::string inputFilename = av[1];
 	Object3d obj = Object3d(inputFilename);
-	Window window = Window();
 	try {
-	window.initEngine(obj);
+		Window window = Window(obj);
+		window.run(obj);
 	} catch (const std::exception& e) {
-	    std::cerr << "Error: initializing the renderer. Reason: " << e.what() << std::endl;
+	    std::cerr << "Fatal renderer error. Reason: " << e.what() << std::endl;
 		std::exit(1);
 	}
-	window.run(obj);
 }

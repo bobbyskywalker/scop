@@ -2,20 +2,14 @@
 
 #include <GLFW/glfw3.h>
 #include "../model/Object3d.hpp"
+#include "../../inc/graphics/engine/Engine.hpp"
 
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480
 
-#define BASE_SHADER_LOCATION "./src/graphics/shaders/"
-
-enum class ShaderLoadable {
-    BASIC_VERT,
-    BASIC_FRAG
-};
-
 class Window {
 public:
-	Window();
+	Window(Object3d& renderable);
 	~Window();
 
 	void initEngine(Object3d& renderable);
@@ -27,15 +21,9 @@ public:
 
 private:
 	GLFWwindow* m_window;
-	unsigned int m_shaderProgram;
-	unsigned int m_VAO;
-	unsigned int m_VBO;
-	unsigned int m_mvpLocation;
+	Object3d& 	m_renderable;
+	Engine* 	m_engine;
 
 	void cleanGlfw();
 	void processInput();
-	unsigned int linkShaders(unsigned int shaders...);
-	unsigned int compileShader(ShaderLoadable shaderFile, int shaderType);
-	std::string loadShader(ShaderLoadable shader);
-
 };

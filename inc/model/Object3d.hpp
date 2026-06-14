@@ -89,6 +89,16 @@ public:
 
 	std::vector<Vertex> getVertices() { return this->m_vertices; }
 
+	std::vector<float> getVerticesFlat() {
+		std::vector<float> vertexData;
+    	for (const auto& v : getVertices()) {
+        vertexData.push_back(v.x);
+        vertexData.push_back(v.y);
+        vertexData.push_back(v.z);
+	    }
+		return vertexData;
+	}
+
 	std::vector<TexCoord> getTexCoords() { return this->m_texcoords; }
 
 	std::vector<Normal> getNormals() { return this->m_normals; }
