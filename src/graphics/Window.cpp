@@ -43,6 +43,8 @@ void Window::run() {
 void Window::processInput() {
 	if(glfwGetKey(this->m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(this->m_window, true);
+	if (glfwGetKey(this->m_window, GLFW_KEY_W) == GLFW_PRESS)
+		this->m_engine->toggleWireframe();
 }
 
 void Window::error_callback(int error, const char* description) {
