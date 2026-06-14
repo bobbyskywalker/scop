@@ -1,8 +1,8 @@
-#include "../../inc/graphics/engine/OpenGLEngine.hpp"
-#include "../../inc/exception/MissingShaderFileException.hpp"
-#include "../../inc/exception/ShaderCompilationException.hpp"
-#include "../../inc/exception/ShaderLinkingErrorException.hpp"
-#include "../../inc/glad/glad.h"
+#include "../../../inc/graphics/engine/OpenGLEngine.hpp"
+#include "../../../inc/exception/MissingShaderFileException.hpp"
+#include "../../../inc/exception/ShaderCompilationException.hpp"
+#include "../../../inc/exception/ShaderLinkingErrorException.hpp"
+#include "../../../inc/glad/glad.h"
 #include <fstream>
 #include <cstdarg>
 
