@@ -1,4 +1,4 @@
-#include "../inc/util.hpp"
+#include "util.hpp"
 #include <sstream>
 
 std::vector<std::string> split(const std::string& s, char delim) {

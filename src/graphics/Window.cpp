@@ -1,6 +1,6 @@
-#include "../../inc/glad/glad.h"
-#include "../../inc/graphics/Window.hpp"
-#include "../../inc/graphics/engine/OpenGLEngine.hpp"
+#include "glad/glad.h"
+#include "graphics/Window.hpp"
+#include "graphics/engine/OpenGLEngine.hpp"
 #include "GLFW/glfw3.h"
 #include <cmath>
 #include <cstddef>

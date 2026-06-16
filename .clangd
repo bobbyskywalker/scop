@@ -1,2 +1,6 @@
 CompileFlags:
-  Add: [-Ilibs/glfw/include, -Iinc, -Isrc, -I.]
+    Add:
+        - "-I${workspaceFolder}/inc"
+        - "-I${workspaceFolder}/libs/glfw/include"
+        - "-I${workspaceFolder}/src"
+        - "-I${workspaceFolder}"

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include "../../../inc/model/Object3d.hpp"
+#include "model/Object3d.hpp"
 #include "Engine.hpp"
 
 #define BASE_SHADER_LOCATION "./src/graphics/shaders/"
@@ -21,6 +21,7 @@ public:
 
 	void render(Object3d& renderable) override;
 	void toggleWireframe() override {this->m_isWireframe = !this->m_isWireframe;}
+	void toggleTexture() {return;}
 
 private:
 	unsigned int	m_shaderProgram;

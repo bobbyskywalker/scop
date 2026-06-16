@@ -1,8 +1,8 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
-#include "../inc/model/Object3d.hpp"
-#include "../inc/graphics/Window.hpp"
+#include "model/Object3d.hpp"
+#include "graphics/Window.hpp"
 
 int main(int ac, char **av) {
 	if (ac != 2) {

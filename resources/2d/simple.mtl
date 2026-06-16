@@ -1,0 +1,9 @@
+# Triangle with different colored faces
+newmtl red
+Kd 0.8 0.2 0.2
+
+newmtl green
+Kd 0.2 0.8 0.2
+
+newmtl blue
+Kd 0.2 0.2 0.8

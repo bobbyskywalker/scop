@@ -1,8 +1,8 @@
 #pragma once
 
 #include <GLFW/glfw3.h>
-#include "../model/Object3d.hpp"
-#include "../../inc/graphics/engine/Engine.hpp"
+#include "model/Object3d.hpp"
+#include "graphics/engine/Engine.hpp"
 
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480
