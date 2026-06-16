@@ -26,7 +26,7 @@ ObjType getObjTokenType(const std::string& token) {
     return ObjType::UNKNOWN;
 }
 
-Object3d::Object3d(const std::string& filename) {
+Object3d::Object3d(const std::string& filename) : m_currentMaterialID("") {
 	loadObjFromFile(filename);
 }
 
@@ -58,6 +58,7 @@ void Object3d::loadObjFromFile(const std::string& filename) {
 		std::cerr << "Error: failed to open file " << filename << std::endl;
 		logError(0, "Failed to open file.");
 	}
+	buildRenderBatches();
 }
 
 bool Object3d::parseLine(const int lineIdx, const std::string& line) {
@@ -233,6 +234,25 @@ void Object3d::parseAndSetCurrentMaterial(const std::vector<std::string>& tokens
 		throw InvalidUseMtlDirective("Invalid usemtl directive. Invalid number of arguments.");
 	}
 	this->m_currentMaterialID = tokens.at(1);
+}
+
+void Object3d::buildRenderBatches() {
+    std::unordered_map<std::string, std::vector<int>> batchMap;
+
+    for (size_t i = 0; i < m_triangles.size(); i++) {
+        std::string matId = m_triangles[i].materialId;
+        if (matId.empty()) {
+            matId = DEFAULT_MTL_ID;
+        }
+        batchMap[matId].push_back(i);
+    }
+
+    m_renderBatches.clear();
+    for (auto& [name, indices] : batchMap) {
+        RenderBatch batch(name);
+        batch.triangleIndices = indices;
+        m_renderBatches.push_back(batch);
+    }
 }
 
 void Object3d::printObject() {

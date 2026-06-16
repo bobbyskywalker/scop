@@ -43,7 +43,7 @@ struct Triangle {
 	int 			texCordIdx[3];
 	int 			normalIdx[3];
 	std::string 	materialId;
-	Triangle() {
+	Triangle() : materialId(DEFAULT_MTL_ID) {
         for (int i = 0; i < 3; i++) {
             verticesId[i] = -1;
             texCordIdx[i] = -1;
@@ -57,13 +57,21 @@ struct Quad {
 	int 			texCordIdx[4];
 	int 			normalIdx[4];
 	std::string 	materialId;
-	Quad() {
+	Quad(): materialId(DEFAULT_MTL_ID) {
         for (int i = 0; i < 4; i++) {
             verticesId[i] = -1;
             texCordIdx[i] = -1;
             normalIdx[i] = -1;
         }
     }
+};
+
+struct RenderBatch {
+    std::string 		materialName;
+    std::vector<int> 	triangleIndices;
+
+    RenderBatch() : materialName(DEFAULT_MTL_ID) {}
+    RenderBatch(const std::string& name) : materialName(name) {}
 };
 
 class Object3d {
@@ -110,6 +118,7 @@ private:
     std::vector<Triangle>           			m_triangles;
     std::string 								m_currentMaterialID;
     std::unordered_map<std::string, Material> 	m_materials;
+    std::vector<RenderBatch>					m_renderBatches;
 
     bool parseLine(const int lineIdx, const std::string& line);
     void parseVertex(const std::vector<std::string>& tokens);
@@ -121,6 +130,7 @@ private:
     void parseFaceTokenIndices(T& shape, int pos, const std::string& indicesStr);
     void triangulateQuad(Quad& q, Triangle& t1, Triangle& t2);
     void parseMaterials(const std::vector<std::string>& tokens);
+    void buildRenderBatches();
 
     void logInfo(const std::string& msg);
     void logError(int lineIdx, const std::string& errmsg);

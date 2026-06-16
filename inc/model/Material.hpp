@@ -3,9 +3,12 @@
 #include <vector>
 #include <string>
 
+#define DEFAULT_MTL_ID "default"
+constexpr float DEFAULT_MTL_COLOR[] = {0.5f, 0.5f, 0.5f};
+
 class Material {
 public:
-    Material(): diffuseMap(""), diffuseColor({}){}
+    Material(): diffuseMap(DEFAULT_MTL_ID), diffuseColor({0.5f, 0.5f, 0.5f}) {}
     ~Material() {}
 
     std::string getDiffuseMap() { return this->diffuseMap; }
