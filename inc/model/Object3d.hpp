@@ -23,22 +23,6 @@ enum class ObjType {
 
 ObjType getObjTokenType(const std::string& token);
 
-/*
-  --- .obj file legend ---
- * v - vertex pos
- * vt - texture coord
- * vn - vertex normal
- * f - face
- * # - comment
-*/
-
-/*
-o	Obj name
-g	Group name
-s	Smoothing group
-usemtl	Material name
-mtllib	Material library */
-
 struct Vertex {
 	float x,y,z;
 	Vertex(float x=0, float y=0, float z=0) : x(x), y(y), z(z) {}
@@ -55,9 +39,10 @@ struct Normal {
 };
 
 struct Triangle {
-	int verticesId[3];
-	int texCordIdx[3];
-	int normalIdx[3];
+	int 			verticesId[3];
+	int 			texCordIdx[3];
+	int 			normalIdx[3];
+	std::string 	materialId;
 	Triangle() {
         for (int i = 0; i < 3; i++) {
             verticesId[i] = -1;
@@ -68,9 +53,10 @@ struct Triangle {
 };
 
 struct Quad {
-	int verticesId[4];
-	int texCordIdx[4];
-	int normalIdx[4];
+	int 			verticesId[4];
+	int 			texCordIdx[4];
+	int 			normalIdx[4];
+	std::string 	materialId;
 	Quad() {
         for (int i = 0; i < 4; i++) {
             verticesId[i] = -1;
@@ -92,9 +78,9 @@ public:
 	std::vector<float> getVerticesFlat() {
 		std::vector<float> vertexData;
     	for (const auto& v : getVertices()) {
-        vertexData.push_back(v.x);
-        vertexData.push_back(v.y);
-        vertexData.push_back(v.z);
+	        vertexData.push_back(v.x);
+	        vertexData.push_back(v.y);
+	        vertexData.push_back(v.z);
 	    }
 		return vertexData;
 	}
@@ -118,17 +104,19 @@ public:
 	void printObject();
 
 private:
-	std::vector<Vertex>             m_vertices;
-    std::vector<TexCoord>           m_texcoords;
-    std::vector<Normal>             m_normals;
-    std::vector<Triangle>           m_triangles;
-    std::unordered_map<std::string, Material> m_materials;
+	std::vector<Vertex>             			m_vertices;
+    std::vector<TexCoord>           			m_texcoords;
+    std::vector<Normal>             			m_normals;
+    std::vector<Triangle>           			m_triangles;
+    std::string 								m_currentMaterialID;
+    std::unordered_map<std::string, Material> 	m_materials;
 
     bool parseLine(const int lineIdx, const std::string& line);
     void parseVertex(const std::vector<std::string>& tokens);
     void parseTexCoord(const std::vector<std::string>& tokens);
     void parseNormal(const std::vector<std::string>& tokens);
     void parseFace(const std::vector<std::string>& tokens);
+    void parseAndSetCurrentMaterial(const std::vector<std::string>& tokens);
     template<typename T>
     void parseFaceTokenIndices(T& shape, int pos, const std::string& indicesStr);
     void triangulateQuad(Quad& q, Triangle& t1, Triangle& t2);

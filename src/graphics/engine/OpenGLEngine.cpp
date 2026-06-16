@@ -61,7 +61,7 @@ OpenGlEngine::OpenGlEngine(Object3d& renderable) {
 OpenGlEngine::~OpenGlEngine() {}
 
 void OpenGlEngine::render(Object3d& renderable) {
-   	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	glClearColor(BACKGROUND_COLOR[0], BACKGROUND_COLOR[1], BACKGROUND_COLOR[2], BACKGROUND_COLOR[3]);
    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	this->m_isWireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

@@ -6,6 +6,8 @@
 
 #define BASE_SHADER_LOCATION "./src/graphics/shaders/"
 
+constexpr float BACKGROUND_COLOR[] = {0.1f, 0.1f, 0.15f, 1.0f};
+
 enum class ShaderLoadable {
     BASIC_VERT,
     BASIC_FRAG

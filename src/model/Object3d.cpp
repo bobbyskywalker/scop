@@ -7,6 +7,7 @@
 #include "../../inc/exception/InvalidNormalParamsException.hpp"
 #include "../../inc/exception/UnknownKeyInObjectFileException.hpp"
 #include "../../inc/exception/InvalidMtlLibParamsException.hpp"
+#include "../../inc/exception/InvalidUseMtlDirective.hpp"
 #include <cstdlib>
 #include <exception>
 #include <fstream>
@@ -87,6 +88,8 @@ bool Object3d::parseLine(const int lineIdx, const std::string& line) {
                     logInfo("Successfully parsed material library at line " + std::to_string(lineIdx) + "\n");
 					break;
 				case ObjType::USE_MTL:
+					parseAndSetCurrentMaterial(tokens);
+					logInfo("Successfully parsed a usemtl directive at line " + std::to_string(lineIdx) + "\n");
 					break;
 				case ObjType::SMOOTHING_GROUP:
 					break;
@@ -149,6 +152,7 @@ void Object3d::parseFace(const std::vector<std::string>& tokens) {
         for (int i = 0; i < 3; i++) {
             parseFaceTokenIndices(triangle, i, tokens[i + 1]);
         }
+        triangle.materialId = m_currentMaterialID;
         m_triangles.push_back(triangle);
 
     } else if (tokens.size() == 5) {
@@ -158,7 +162,9 @@ void Object3d::parseFace(const std::vector<std::string>& tokens) {
         }
         Triangle t1, t2;
         triangulateQuad(quad, t1, t2);
+        t1.materialId = m_currentMaterialID;
         m_triangles.push_back(t1);
+        t2.materialId = m_currentMaterialID;
         m_triangles.push_back(t2);
     } else {
         throw InvalidFaceParamsException("Invalid face definition: invalid number of arguments.");
@@ -219,7 +225,14 @@ void Object3d::parseMaterials(const std::vector<std::string>& tokens) {
         throw InvalidMtlLibParamsException("Invalid material library definition. Invalid number of arguments.");
     }
     auto materials = MaterialLoader::parseMaterials(tokens.at(1));
-    m_materials = materials;
+    m_materials.insert(materials.begin(), materials.end());
+}
+
+void Object3d::parseAndSetCurrentMaterial(const std::vector<std::string>& tokens) {
+	if (tokens.size() != 2) {
+		throw InvalidUseMtlDirective("Invalid usemtl directive. Invalid number of arguments.");
+	}
+	this->m_currentMaterialID = tokens.at(1);
 }
 
 void Object3d::printObject() {
