@@ -83,9 +83,9 @@ public:
 
 	void loadObjFromFile(const std::string& filename);
 
-	std::vector<Vertex> getVertices() { return this->m_vertices; }
+	const std::vector<Vertex> getVertices() const { return this->m_vertices; }
 
-	std::vector<float> getVerticesFlat() {
+	const std::vector<float> getVerticesFlat() const {
 		std::vector<float> vertexData;
     	for (const auto& v : getVertices()) {
 	        vertexData.push_back(v.x);
@@ -95,11 +95,11 @@ public:
 		return vertexData;
 	}
 
-	std::vector<TexCoord> getTexCoords() { return this->m_texcoords; }
+	std::vector<TexCoord> getTexCoords() const { return this->m_texcoords; }
 
-	std::vector<Normal> getNormals() { return this->m_normals; }
+	std::vector<Normal> getNormals() const { return this->m_normals; }
 
-	std::vector<Triangle> getTriangles() { return this->m_triangles; }
+	std::vector<Triangle> getTriangles() const { return this->m_triangles; }
 
 	std::vector<unsigned int> getIndices() const {
 	    std::vector<unsigned int> idx;
@@ -111,11 +111,11 @@ public:
 	    return idx;
 	}
 
-	std::unordered_map<std::string, Material> getMaterials() { return this->m_materials; }
+	std::unordered_map<std::string, Material> getMaterials() const { return this->m_materials; }
 
-	std::vector<RenderBatch> getRenderBatches() { return this->m_renderBatches; }
+	const std::vector<RenderBatch> getRenderBatches() const { return this->m_renderBatches; }
 
-	void printObject();
+	void printObject() const;
 
 private:
 	std::vector<Vertex>             			m_vertices;
@@ -133,12 +133,12 @@ private:
     void parseFace(const std::vector<std::string>& tokens);
     void parseAndSetCurrentMaterial(const std::vector<std::string>& tokens);
     template<typename T>
-    void parseFaceTokenIndices(T& shape, int pos, const std::string& indicesStr);
-    void triangulateQuad(Quad& q, Triangle& t1, Triangle& t2);
+    void parseFaceTokenIndices(T& shape, const int pos, const std::string& indicesStr);
+    void triangulateQuad(const Quad& q, Triangle& t1, Triangle& t2);
     void parseMaterials(const std::vector<std::string>& tokens);
     void buildRenderBatches();
 
     void logInfo(const std::string& msg);
-    void logError(int lineIdx, const std::string& errmsg);
+    void logError(const int lineIdx, const std::string& errmsg);
 
 };

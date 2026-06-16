@@ -6,7 +6,7 @@
 	#include <fstream>
 	#include <cstdarg>
 
-const std::string getShaderFilename(ShaderLoadable shader) {
+const std::string getShaderFilename(const ShaderLoadable shader) {
     if (shader == ShaderLoadable::BASIC_VERT) {
         return std::string(BASE_SHADER_LOCATION) + "basic_vert.glsl";
     } else if (shader == ShaderLoadable::BASIC_FRAG) {
@@ -15,7 +15,7 @@ const std::string getShaderFilename(ShaderLoadable shader) {
     return "";
 }
 
-OpenGlEngine::OpenGlEngine(Object3d& renderable) {
+OpenGlEngine::OpenGlEngine(const Object3d& renderable) {
 	m_isWireframe = false;
 
 	/* compile shaders */
@@ -61,7 +61,7 @@ OpenGlEngine::OpenGlEngine(Object3d& renderable) {
 
 OpenGlEngine::~OpenGlEngine() {}
 
-void OpenGlEngine::render(Object3d& renderable) {
+void OpenGlEngine::render(const Object3d& renderable) {
 	glClearColor(BACKGROUND_COLOR[0], BACKGROUND_COLOR[1], BACKGROUND_COLOR[2], BACKGROUND_COLOR[3]);
    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -74,7 +74,7 @@ void OpenGlEngine::render(Object3d& renderable) {
    		renderBatch(renderable,b);
 }
 
-void OpenGlEngine::renderBatch(Object3d& renderable, const RenderBatch& currentBatch) {
+void OpenGlEngine::renderBatch(const Object3d& renderable, const RenderBatch& currentBatch) {
 	auto mtls = renderable.getMaterials();
    	Material& currentMtl = mtls[currentBatch.materialName];
    	auto color = currentMtl.getDiffuseColor();

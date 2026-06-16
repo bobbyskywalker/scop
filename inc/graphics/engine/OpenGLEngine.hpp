@@ -16,12 +16,12 @@ enum class ShaderLoadable {
 
 class OpenGlEngine: public Engine {
 public:
-	OpenGlEngine(Object3d &renderable);
+	OpenGlEngine(const Object3d &renderable);
 	~OpenGlEngine() override;
 
-	void render(Object3d& renderable) override;
+	void render(const Object3d& renderable) override;
 	void toggleWireframe() override {this->m_isWireframe = !this->m_isWireframe;}
-	void toggleTexture() {return;}
+	void toggleTexture() override {return;}
 
 private:
 	unsigned int	m_shaderProgram;
@@ -32,7 +32,7 @@ private:
 	bool			m_isWireframe;
 
 	unsigned int 	linkShaders(unsigned int shaders...);
-	unsigned int 	compileShader(ShaderLoadable shaderFile, int shaderType);
-	std::string 	loadShader(ShaderLoadable shader);
-	void 			renderBatch(Object3d& renderable, const RenderBatch& currentBatch);
+	unsigned int 	compileShader(const ShaderLoadable shaderFile, const int shaderType);
+	std::string 	loadShader(const ShaderLoadable shader);
+	void 			renderBatch(const Object3d& renderable, const RenderBatch& currentBatch);
 };

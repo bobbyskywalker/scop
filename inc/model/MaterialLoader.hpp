@@ -42,7 +42,7 @@ public:
 
 private:
     static void logInfo(const std::string& msg);
-    static void logError(int lineIdx, const std::string& msg);
+    static void logError(const int lineIdx, const std::string& msg);
 
     static bool parseLine(
         const int lineIdx,

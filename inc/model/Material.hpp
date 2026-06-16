@@ -11,10 +11,10 @@ public:
     Material(): diffuseMap(DEFAULT_MTL_ID), diffuseColor({0.5f, 0.5f, 0.5f}) {}
     ~Material() {}
 
-    std::string getDiffuseMap() { return this->diffuseMap; }
+    std::string getDiffuseMap() const { return this->diffuseMap; }
     void setDiffuseMap(const std::string diffuseMap) { this->diffuseMap = diffuseMap; }
 
-    std::vector<float> getDiffuseColor() { return this->diffuseColor; };
+    std::vector<float> getDiffuseColor() const { return this->diffuseColor; };
     void setDiffuseColor(const std::vector<float> diffuseColor) { this->diffuseColor = diffuseColor; }
 
 private:

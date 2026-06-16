@@ -38,7 +38,7 @@ void Object3d::logInfo(const std::string& msg) {
     logFile << msg << std::endl;
 }
 
-void Object3d::logError(int lineIdx, const std::string& errmsg) {
+void Object3d::logError(const int lineIdx, const std::string& errmsg) {
 	static std::ofstream logFile("debug_obj.log");
 	logFile << PARSER_ERROR_LOG + std::to_string(lineIdx) << ": " << errmsg;
 }
@@ -174,7 +174,7 @@ void Object3d::parseFace(const std::vector<std::string>& tokens) {
 }
 
 template<typename T>
-void Object3d::parseFaceTokenIndices(T& shape, int pos, const std::string& indicesStr) {
+void Object3d::parseFaceTokenIndices(T& shape, const int pos, const std::string& indicesStr) {
     std::vector<std::string> indices = split(indicesStr, FACE_TOKEN_DELIMITER);
 
     shape.verticesId[pos] = std::stoi(indices[0]) - 1;
@@ -192,7 +192,7 @@ void Object3d::parseFaceTokenIndices(T& shape, int pos, const std::string& indic
     }
 }
 
-void Object3d::triangulateQuad(Quad& q, Triangle& t1, Triangle& t2) {
+void Object3d::triangulateQuad(const Quad& q, Triangle& t1, Triangle& t2) {
     t1.verticesId[0] = q.verticesId[0];
     t1.verticesId[1] = q.verticesId[1];
     t1.verticesId[2] = q.verticesId[2];
@@ -260,7 +260,7 @@ void Object3d::buildRenderBatches() {
     }
 }
 
-void Object3d::printObject() {
+void Object3d::printObject() const {
     for (std::size_t i = 0; i < m_vertices.size(); i++) {
         std::cout << "Vertex " << i+1 << ": ("
                   << m_vertices[i].x << ", "

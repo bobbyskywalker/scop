@@ -40,7 +40,7 @@ void MaterialLoader::logInfo(const std::string& msg) {
     logFile << msg << std::endl;
 }
 
-void MaterialLoader::logError(int lineIdx, const std::string& errmsg) {
+void MaterialLoader::logError(const int lineIdx, const std::string& errmsg) {
 	static std::ofstream logFile("debug_mtl.log");
 	logFile << PARSER_ERROR_LOG + std::to_string(lineIdx) << ": " << errmsg;
 }

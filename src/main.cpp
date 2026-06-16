@@ -9,7 +9,7 @@ int main(int ac, char **av) {
 		std::cout << "Valid exec.: ./scop <filename>";
 		std::exit(1);
 	}
-	std::string inputFilename = av[1];
+	const std::string inputFilename = av[1];
 	Object3d obj = Object3d(inputFilename);
 	try {
 		Window window = Window(obj);
