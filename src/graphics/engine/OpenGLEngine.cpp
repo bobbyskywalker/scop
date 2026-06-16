@@ -70,14 +70,17 @@ void OpenGlEngine::render(Object3d& renderable) {
     glUseProgram(m_shaderProgram);
     glBindVertexArray(m_VAO);
 
-    for (const auto& b: renderable.getRenderBatches()) {
-    	auto mtls = renderable.getMaterials();
-     	Material& currentMtl = mtls[b.materialName];
-     	auto color = currentMtl.getDiffuseColor();
-    	glUniform4f(m_vertexColorLocation, color[0], color[1], color[2], 2.0f);
-    	auto start = b.triangleIndices[0] * 3 * sizeof(unsigned int);
-     	glDrawElements(GL_TRIANGLES, b.triangleIndices.size() * 3, GL_UNSIGNED_INT, (void*)start);
-    }
+    for (const auto& b: renderable.getRenderBatches())
+   		renderBatch(renderable,b);
+}
+
+void OpenGlEngine::renderBatch(Object3d& renderable, const RenderBatch& currentBatch) {
+	auto mtls = renderable.getMaterials();
+   	Material& currentMtl = mtls[currentBatch.materialName];
+   	auto color = currentMtl.getDiffuseColor();
+   	glUniform4f(m_vertexColorLocation, color[0], color[1], color[2], 2.0f);
+   	auto start = currentBatch.triangleIndices[0] * 3 * sizeof(unsigned int);
+   	glDrawElements(GL_TRIANGLES, currentBatch.triangleIndices.size() * 3, GL_UNSIGNED_INT, (void*)start);
 }
 
 std::string OpenGlEngine::loadShader(ShaderLoadable shader) {

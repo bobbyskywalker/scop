@@ -33,4 +33,5 @@ private:
 	unsigned int 	linkShaders(unsigned int shaders...);
 	unsigned int 	compileShader(ShaderLoadable shaderFile, int shaderType);
 	std::string 	loadShader(ShaderLoadable shader);
+	void 			renderBatch(Object3d& renderable, const RenderBatch& currentBatch);
 };
