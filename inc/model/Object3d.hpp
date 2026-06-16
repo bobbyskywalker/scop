@@ -69,6 +69,8 @@ struct Quad {
 struct RenderBatch {
     std::string 		materialName;
     std::vector<int> 	triangleIndices;
+    int 				startTriangle;
+    int 				batchSize;
 
     RenderBatch() : materialName(DEFAULT_MTL_ID) {}
     RenderBatch(const std::string& name) : materialName(name) {}
@@ -108,6 +110,10 @@ public:
 	    }
 	    return idx;
 	}
+
+	std::unordered_map<std::string, Material> getMaterials() { return this->m_materials; }
+
+	std::vector<RenderBatch> getRenderBatches() { return this->m_renderBatches; }
 
 	void printObject();
 

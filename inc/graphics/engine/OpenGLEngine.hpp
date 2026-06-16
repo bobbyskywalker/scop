@@ -5,6 +5,7 @@
 #include "Engine.hpp"
 
 #define BASE_SHADER_LOCATION "./src/graphics/shaders/"
+#define VERTEX_COLOR_LOCATION "m_color"
 
 constexpr float BACKGROUND_COLOR[] = {0.1f, 0.1f, 0.15f, 1.0f};
 
@@ -26,6 +27,7 @@ private:
 	unsigned int	m_VAO;
 	unsigned int	m_VBO;
 	unsigned int	m_EBO;
+	int				m_vertexColorLocation;
 	bool			m_isWireframe;
 
 	unsigned int 	linkShaders(unsigned int shaders...);

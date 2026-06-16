@@ -12,6 +12,7 @@
 #include <exception>
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 
 ObjType getObjTokenType(const std::string& token) {
     if (token == "v") return ObjType::VERTEX;
@@ -237,6 +238,10 @@ void Object3d::parseAndSetCurrentMaterial(const std::vector<std::string>& tokens
 }
 
 void Object3d::buildRenderBatches() {
+	std::sort(this->m_triangles.begin(), this->m_triangles.end(), [](const Triangle& a, const Triangle& b){
+		return a.materialId < b.materialId;
+	});
+
     std::unordered_map<std::string, std::vector<int>> batchMap;
 
     for (size_t i = 0; i < m_triangles.size(); i++) {
