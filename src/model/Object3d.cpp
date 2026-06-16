@@ -8,6 +8,7 @@
 #include "exception/parser/UnknownKeyInObjectFileException.hpp"
 #include "exception/parser/InvalidMtlLibParamsException.hpp"
 #include "exception/parser/InvalidUseMtlDirective.hpp"
+#include "exception/parser/MalformedObjFileDeclarationException.hpp"
 #include <cstdlib>
 #include <exception>
 #include <fstream>
@@ -51,13 +52,13 @@ void Object3d::loadObjFromFile(const std::string& filename) {
 	if (objFile.is_open()) {
 		while(std::getline(objFile, line)) {
 			if (!parseLine(idx++, line)) {
-				break;
+				throw MalformedObjFileDeclarationException("Error while parsing obj file. Check debug_obj.log and debug_mtl.log files for details.");
 			}
 		}
 		objFile.close();
 	} else {
-		std::cerr << "Error: failed to open file " << filename << std::endl;
 		logError(0, "Failed to open file.");
+		throw MalformedObjFileDeclarationException("Error: failed to open file " + filename + ". Is the path correct?");
 	}
 	buildRenderBatches();
 }
