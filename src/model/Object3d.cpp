@@ -58,7 +58,7 @@ void Object3d::loadObjFromFile(const std::string& filename) {
 		objFile.close();
 	} else {
 		logError(0, "Failed to open file.");
-		throw MalformedObjFileDeclarationException("Error: failed to open file " + filename + ". Is the path correct?");
+		throw MalformedObjFileDeclarationException("Failed to open file " + filename + ". Is the path correct?");
 	}
 	buildRenderBatches();
 }
