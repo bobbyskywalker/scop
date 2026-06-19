@@ -99,13 +99,17 @@ bool MaterialLoader::parseLine(
                     break;
 
                 case MtlType::DIFFUSE_COLOR:
-                    parseColor(tokens, currentMaterial);
-                    logInfo("Successfuly parsed diffuse color at line " + std::to_string(lineIdx) + "\n");
+                	if (!currentName.empty()) {
+                    	parseColor(tokens, currentMaterial);
+                     	logInfo("Successfuly parsed diffuse color at line " + std::to_string(lineIdx) + "\n");
+                 	}
                     break;
 
                 case MtlType::DIFFUSE_MAP:
-                    currentMaterial.setDiffuseMap(tokens.at(1));
-                    logInfo("Successfuly diffuse texture map at line " + std::to_string(lineIdx) + "\n");
+                	if (!currentName.empty()) {
+                    	currentMaterial.setDiffuseMap(tokens.at(1));
+                     	logInfo("Successfuly diffuse texture map at line " + std::to_string(lineIdx) + "\n");
+                 	}
                     break;
 
                 case MtlType::UNKNOWN:
