@@ -1,11 +1,14 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 #include "model/Object3d.hpp"
 #include "Engine.hpp"
 
 #define BASE_SHADER_LOCATION "./src/graphics/shaders/"
-#define VERTEX_COLOR_LOCATION "m_color"
+#define VERTEX_COLOR_LOCATION "u_color"
+#define VERTEX_TEXTURE_LOCATION "m_texture"
+#define BLENDING_LOCATION "u_blend"
 
 constexpr float BACKGROUND_COLOR[] = {0.1f, 0.1f, 0.15f, 1.0f};
 
@@ -24,15 +27,22 @@ public:
 	void toggleTexture() override {return;}
 
 private:
-	unsigned int	m_shaderProgram;
-	unsigned int	m_VAO;
-	unsigned int	m_VBO;
-	unsigned int	m_EBO;
-	int				m_vertexColorLocation;
-	bool			m_isWireframe;
+	unsigned int									m_shaderProgram;
+	unsigned int									m_VAO;
+	unsigned int									m_VBO;
+	unsigned int									m_EBO;
+	int												m_vertexColorLocation;
+	int												m_textureLocation;
+	bool											m_isWireframe;
+	bool											m_isTexture;
+	unsigned char 									*m_diffuseTextureData;
+	std::unordered_map<std::string, unsigned int>    m_textures;
 
+	void			loadTextures(const std::unordered_map<std::string, Material>& materials);
+	unsigned int 	loadTexture(const std::string& path);
 	unsigned int 	linkShaders(unsigned int shaders...);
 	unsigned int 	compileShader(const ShaderLoadable shaderFile, const int shaderType);
 	std::string 	loadShader(const ShaderLoadable shader);
 	void 			renderBatch(const Object3d& renderable, const RenderBatch& currentBatch);
+	void 			applySelectedColorMode(const std::vector<float>& diffuseColor, float blendingLevel);
 };

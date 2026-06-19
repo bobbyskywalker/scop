@@ -1,10 +1,14 @@
-	#include "graphics/engine/OpenGLEngine.hpp"
-	#include "exception/shaders/MissingShaderFileException.hpp"
-	#include "exception/shaders/ShaderCompilationException.hpp"
-	#include "exception/shaders/ShaderLinkingErrorException.hpp"
-	#include "glad/glad.h"
-	#include <fstream>
-	#include <cstdarg>
+#include "graphics/engine/OpenGLEngine.hpp"
+#include "exception/textures/TextureDataLoadingException.hpp"
+#include "graphics/engine/texture.hpp"
+#include "exception/shaders/MissingShaderFileException.hpp"
+#include "exception/shaders/ShaderCompilationException.hpp"
+#include "exception/shaders/ShaderLinkingErrorException.hpp"
+#include "exception/textures/TextureDataLoadingException.hpp"
+#include "graphics/engine/texture.hpp"
+#include "glad/glad.h"
+#include <fstream>
+#include <cstdarg>
 
 const std::string getShaderFilename(const ShaderLoadable shader) {
     if (shader == ShaderLoadable::BASIC_VERT) {
@@ -17,6 +21,8 @@ const std::string getShaderFilename(const ShaderLoadable shader) {
 
 OpenGlEngine::OpenGlEngine(const Object3d& renderable) {
 	m_isWireframe = false;
+	// todo texture toggling
+	m_isTexture = true;
 
 	/* compile shaders */
     unsigned int vertexShader = compileShader(ShaderLoadable::BASIC_VERT, GL_VERTEX_SHADER);
@@ -32,7 +38,7 @@ OpenGlEngine::OpenGlEngine(const Object3d& renderable) {
     glGenBuffers(1, &m_VBO);
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 
-    auto vertices = renderable.getVerticesFlat();
+    auto vertices = renderable.getVerticesWithUVMappingArray();
     glBufferData(GL_ARRAY_BUFFER,
                  vertices.size() * sizeof(float),
                  vertices.data(),
@@ -49,8 +55,17 @@ OpenGlEngine::OpenGlEngine(const Object3d& renderable) {
     );
 
     /* link vertex attributes */
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    /* position attribute */
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    /* uv attribute */
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    /* texture data loading */
+    m_textureLocation = glGetUniformLocation(m_shaderProgram,  VERTEX_TEXTURE_LOCATION);
+    loadTextures(renderable.getMaterials());
 
     /* cleanup */
     glDeleteShader(vertexShader);
@@ -66,7 +81,6 @@ void OpenGlEngine::render(const Object3d& renderable) {
    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	this->m_isWireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
     glUseProgram(m_shaderProgram);
     glBindVertexArray(m_VAO);
 
@@ -75,12 +89,27 @@ void OpenGlEngine::render(const Object3d& renderable) {
 }
 
 void OpenGlEngine::renderBatch(const Object3d& renderable, const RenderBatch& currentBatch) {
-	auto mtls = renderable.getMaterials();
-   	Material& currentMtl = mtls[currentBatch.materialName];
-   	auto color = currentMtl.getDiffuseColor();
-   	glUniform4f(m_vertexColorLocation, color[0], color[1], color[2], 2.0f);
-   	auto start = currentBatch.triangleIndices[0] * 3 * sizeof(unsigned int);
-   	glDrawElements(GL_TRIANGLES, currentBatch.triangleIndices.size() * 3, GL_UNSIGNED_INT, (void*)start);
+    auto mtls = renderable.getMaterials();
+    Material& currentMtl = mtls[currentBatch.materialName];
+
+    if (m_isTexture && m_textures.count(currentBatch.materialName)) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_textures[currentBatch.materialName]);
+        glUniform1i(m_textureLocation, 0);
+        applySelectedColorMode(currentMtl.getDiffuseColor(), 1.0f);
+    } else {
+    	applySelectedColorMode(currentMtl.getDiffuseColor(), 0.0f);
+    }
+
+    auto start = currentBatch.triangleIndices[0] * 3 * sizeof(unsigned int);
+    glDrawElements(GL_TRIANGLES, currentBatch.triangleIndices.size() * 3, GL_UNSIGNED_INT, (void*)start);
+}
+
+void OpenGlEngine::applySelectedColorMode(const std::vector<float>& diffuseColor, float blendingLevel) {
+	int blendLocation = glGetUniformLocation(m_shaderProgram, BLENDING_LOCATION);
+    int colorLocation = glGetUniformLocation(m_shaderProgram, VERTEX_COLOR_LOCATION);
+    glUniform3f(colorLocation, diffuseColor[0], diffuseColor[1], diffuseColor[2]);
+    glUniform1f(blendLocation, blendingLevel);
 }
 
 std::string OpenGlEngine::loadShader(ShaderLoadable shader) {
@@ -144,4 +173,39 @@ unsigned int OpenGlEngine::linkShaders(unsigned int shader, ...) {
     }
 
     return shaderProgram;
+}
+
+void OpenGlEngine::loadTextures(const std::unordered_map<std::string, Material>& materials) {
+	for (const auto& [name, material] : materials) {
+		if (!material.getDiffuseMap().empty()) {
+			unsigned int textureID = loadTexture(material.getDiffuseMap());
+			m_textures[name] = textureID;
+		}
+	}
+}
+
+unsigned int OpenGlEngine::loadTexture(const std::string& path) {
+    int width, height, nrChannels;
+    unsigned char* data = loadTextureData(&width, &height, &nrChannels, path);
+    if (!data) {
+   		throw TextureDataLoadingException("ERROR::TEXTURE::PROGRAM::LOADING_FAILED\n");
+    }
+
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
+
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    freeTextureData(data);
+
+    return textureID;
 }

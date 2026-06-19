@@ -111,6 +111,24 @@ public:
 	    return idx;
 	}
 
+	std::vector<float> getVerticesWithUVMappingArray() const {
+		std::vector<float> data;
+    	for (size_t i = 0; i < m_vertices.size(); i++) {
+     		data.push_back(m_vertices[i].x);
+         	data.push_back(m_vertices[i].y);
+          	data.push_back(m_vertices[i].z);
+
+           if (i < m_texcoords.size()) {
+            	data.push_back(m_texcoords[i].u);
+             	data.push_back(m_texcoords[i].v);
+           } else {
+            	data.push_back(0.0f);
+             	data.push_back(0.0f);
+           }
+     	}
+     	return data;
+	}
+
 	std::unordered_map<std::string, Material> getMaterials() const { return this->m_materials; }
 
 	const std::vector<RenderBatch> getRenderBatches() const { return this->m_renderBatches; }
@@ -136,6 +154,7 @@ private:
     void parseFaceTokenIndices(T& shape, const int pos, const std::string& indicesStr);
     void triangulateQuad(const Quad& q, Triangle& t1, Triangle& t2);
     void parseMaterials(const std::vector<std::string>& tokens);
+    void loadTextures();
     void buildRenderBatches();
 
     void logInfo(const std::string& msg);

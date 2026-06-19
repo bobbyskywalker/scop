@@ -8,7 +8,7 @@ constexpr float DEFAULT_MTL_COLOR[] = {0.5f, 0.5f, 0.5f};
 
 class Material {
 public:
-    Material(): diffuseMap(DEFAULT_MTL_ID), diffuseColor({0.5f, 0.5f, 0.5f}) {}
+    Material(): diffuseMap(""), diffuseColor({0.5f, 0.5f, 0.5f}) {}
     ~Material() {}
 
     std::string getDiffuseMap() const { return this->diffuseMap; }
