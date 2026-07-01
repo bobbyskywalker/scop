@@ -45,6 +45,8 @@ void Window::processInput() {
         glfwSetWindowShouldClose(this->m_window, true);
 	if (glfwGetKey(this->m_window, GLFW_KEY_W) == GLFW_PRESS)
 		this->m_engine->toggleWireframe();
+	if (glfwGetKey(this->m_window, GLFW_KEY_T) == GLFW_PRESS)
+		this->m_engine->toggleTexture();
 }
 
 void Window::error_callback(int error, const char* description) {

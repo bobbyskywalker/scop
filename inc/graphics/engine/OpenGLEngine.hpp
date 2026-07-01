@@ -24,7 +24,7 @@ public:
 
 	void render(const Object3d& renderable) override;
 	void toggleWireframe() override {this->m_isWireframe = !this->m_isWireframe;}
-	void toggleTexture() override {return;}
+	void toggleTexture() override {this->m_isTexture= !this->m_isTexture;}
 
 private:
 	unsigned int									m_shaderProgram;

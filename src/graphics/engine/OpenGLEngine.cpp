@@ -21,8 +21,7 @@ const std::string getShaderFilename(const ShaderLoadable shader) {
 
 OpenGlEngine::OpenGlEngine(const Object3d& renderable) {
 	m_isWireframe = false;
-	// todo texture toggling
-	m_isTexture = true;
+	m_isTexture = false;
 
 	/* compile shaders */
     unsigned int vertexShader = compileShader(ShaderLoadable::BASIC_VERT, GL_VERTEX_SHADER);
