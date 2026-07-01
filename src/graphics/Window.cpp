@@ -18,7 +18,11 @@ Window::Window(Object3d& renderable) : m_renderable(renderable), m_engine(nullpt
 		std::cerr << "Error: GLFW window creation failure" << std::endl;
 		std::exit(1);
 	}
+
 	glfwMakeContextCurrent(this->m_window);
+
+	glfwSetWindowUserPointer(m_window, this);
+	glfwSetKeyCallback(m_window, key_callback);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cerr << "Error: GLAD initialization failure" << std::endl;
@@ -32,12 +36,29 @@ Window::~Window() {}
 
 void Window::run() {
     while (!glfwWindowShouldClose(m_window)) {
-   		this->m_engine->render(this->m_renderable);
-        processInput();
+   		this->m_engine->render(this->m_renderable, glfwGetTime(), (float)WINDOW_WIDTH/(float) WINDOW_HEIGHT);
         glfwSwapBuffers(m_window);
         glfwPollEvents();
     }
     cleanGlfw();
+}
+
+void Window::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    (void)scancode; (void)mods;
+    Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, true);
+    }
+    if (key == GLFW_KEY_W && action == GLFW_PRESS) {
+    	win->m_engine->toggleWireframe();
+    }
+    if (key == GLFW_KEY_T && action == GLFW_PRESS) {
+        win->m_engine->toggleTexture();
+    }
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
+        win->m_engine->toggleRotation();
+    }
 }
 
 void Window::processInput() {
@@ -47,6 +68,8 @@ void Window::processInput() {
 		this->m_engine->toggleWireframe();
 	if (glfwGetKey(this->m_window, GLFW_KEY_T) == GLFW_PRESS)
 		this->m_engine->toggleTexture();
+	if (glfwGetKey(this->m_window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		this->m_engine->toggleRotation();
 }
 
 void Window::error_callback(int error, const char* description) {

@@ -4,11 +4,13 @@
 #include "exception/shaders/MissingShaderFileException.hpp"
 #include "exception/shaders/ShaderCompilationException.hpp"
 #include "exception/shaders/ShaderLinkingErrorException.hpp"
-#include "exception/textures/TextureDataLoadingException.hpp"
 #include "graphics/engine/texture.hpp"
 #include "glad/glad.h"
+#include <cmath>
 #include <fstream>
 #include <cstdarg>
+#include "math/math3d.h"
+#define _USE_MATH_DEFINES
 
 const std::string getShaderFilename(const ShaderLoadable shader) {
     if (shader == ShaderLoadable::BASIC_VERT) {
@@ -22,6 +24,7 @@ const std::string getShaderFilename(const ShaderLoadable shader) {
 OpenGlEngine::OpenGlEngine(const Object3d& renderable) {
 	m_isWireframe = false;
 	m_isTexture = false;
+	m_isRotating = false;
 
 	/* compile shaders */
     unsigned int vertexShader = compileShader(ShaderLoadable::BASIC_VERT, GL_VERTEX_SHADER);
@@ -29,6 +32,11 @@ OpenGlEngine::OpenGlEngine(const Object3d& renderable) {
 
     m_shaderProgram = linkShaders(vertexShader, fragmentShader, 0);
     glUseProgram(m_shaderProgram);
+
+    /* set uniform locations */
+    m_blendLocation = glGetUniformLocation(m_shaderProgram, BLENDING_LOCATION);
+    m_vertexColorLocation = glGetUniformLocation(m_shaderProgram, VERTEX_COLOR_LOCATION);
+    m_transformLocation = glGetUniformLocation(m_shaderProgram, TRANSFORM_LOCATION);
 
     /* VAO/VBO/EBO setup */
     glGenVertexArrays(1, &m_VAO);
@@ -75,9 +83,12 @@ OpenGlEngine::OpenGlEngine(const Object3d& renderable) {
 
 OpenGlEngine::~OpenGlEngine() {}
 
-void OpenGlEngine::render(const Object3d& renderable) {
+void OpenGlEngine::render(const Object3d& renderable, const float deltaTime, const float aspect) {
 	glClearColor(BACKGROUND_COLOR[0], BACKGROUND_COLOR[1], BACKGROUND_COLOR[2], BACKGROUND_COLOR[3]);
    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    mat4 mvp = buildMvp(deltaTime, aspect);
+    glUniformMatrix4fv(m_transformLocation, 1, GL_FALSE, &mvp.matrix[0][0]);
 
 	this->m_isWireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glUseProgram(m_shaderProgram);
@@ -105,10 +116,8 @@ void OpenGlEngine::renderBatch(const Object3d& renderable, const RenderBatch& cu
 }
 
 void OpenGlEngine::applySelectedColorMode(const std::vector<float>& diffuseColor, float blendingLevel) {
-	int blendLocation = glGetUniformLocation(m_shaderProgram, BLENDING_LOCATION);
-    int colorLocation = glGetUniformLocation(m_shaderProgram, VERTEX_COLOR_LOCATION);
-    glUniform3f(colorLocation, diffuseColor[0], diffuseColor[1], diffuseColor[2]);
-    glUniform1f(blendLocation, blendingLevel);
+    glUniform3f(m_vertexColorLocation, diffuseColor[0], diffuseColor[1], diffuseColor[2]);
+    glUniform1f(m_blendLocation, blendingLevel);
 }
 
 std::string OpenGlEngine::loadShader(ShaderLoadable shader) {
@@ -207,4 +216,15 @@ unsigned int OpenGlEngine::loadTexture(const std::string& path) {
     freeTextureData(data);
 
     return textureID;
+}
+
+// TODO:
+// rotation over main symmetry axis
+// constant definition
+// object movement
+mat4 OpenGlEngine::buildMvp(const float deltaTime, const float aspect) {
+	mat4 proj = perspective(45.0f * M_PI / 180.0f, aspect, 0.1f, 100.0f);
+    mat4 view = translate({0.0f, 0.0f, -5.0f});
+    mat4 model = m_isRotating ? rotateY(deltaTime * 0.5f) : mat_identity();
+    return mat_multiply(proj, mat_multiply(view, model));
 }
