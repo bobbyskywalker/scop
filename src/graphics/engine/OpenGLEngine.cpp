@@ -26,6 +26,8 @@ OpenGlEngine::OpenGlEngine(const Object3d& renderable) {
 	m_isTexture = false;
 	m_isRotating = false;
 
+	glEnable(GL_DEPTH_TEST);
+
 	/* compile shaders */
     unsigned int vertexShader = compileShader(ShaderLoadable::BASIC_VERT, GL_VERTEX_SHADER);
     unsigned int fragmentShader = compileShader(ShaderLoadable::BASIC_FRAG, GL_FRAGMENT_SHADER);
@@ -87,11 +89,11 @@ void OpenGlEngine::render(const Object3d& renderable, const float deltaTime, con
 	glClearColor(BACKGROUND_COLOR[0], BACKGROUND_COLOR[1], BACKGROUND_COLOR[2], BACKGROUND_COLOR[3]);
    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    glUseProgram(m_shaderProgram);
     mat4 mvp = buildMvp(deltaTime, aspect);
-    glUniformMatrix4fv(m_transformLocation, 1, GL_FALSE, &mvp.matrix[0][0]);
+    glUniformMatrix4fv(m_transformLocation, 1, GL_TRUE, &mvp.matrix[0][0]);
 
 	this->m_isWireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    glUseProgram(m_shaderProgram);
     glBindVertexArray(m_VAO);
 
     for (const auto& b: renderable.getRenderBatches())

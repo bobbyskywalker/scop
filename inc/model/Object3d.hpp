@@ -120,7 +120,7 @@ public:
 
            if (i < m_texcoords.size()) {
             	data.push_back(m_texcoords[i].u);
-             	data.push_back(m_texcoords[i].v);
+             	data.push_back(-m_texcoords[i].v);
            } else {
             	data.push_back(0.0f);
              	data.push_back(0.0f);
