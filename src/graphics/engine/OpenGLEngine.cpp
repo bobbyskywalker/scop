@@ -22,15 +22,15 @@ const std::string getShaderFilename(const ShaderLoadable shader) {
     return "";
 }
 
-OpenGlEngine::OpenGlEngine(const Object3d& renderable) {
-	m_isWireframe = false;
-	m_isTexture = false;
-	m_isRotating = false;
-	m_objectPos = {0.0f, 0.0f, 0.0f};
-	m_movementSpeed = 5.0f;
-	m_rotationAngle = 0.0f;
-	m_rotationSpeed = 1.0f;
-
+OpenGlEngine::OpenGlEngine(const Object3d& renderable):
+    m_isWireframe(false),
+    m_isTexture(false),
+    m_isRotating(false),
+    m_objectPos({0.0f, 0.0f, 0.0f}),
+    m_movementSpeed(DEFAULT_MOVEMENT_SPEED),
+    m_rotationAngle(0.0f),
+    m_rotationSpeed(DEFAULT_ROTATION_SPEED)
+{
 	glEnable(GL_DEPTH_TEST);
 
 	/* compile shaders */
@@ -78,7 +78,7 @@ OpenGlEngine::OpenGlEngine(const Object3d& renderable) {
     glEnableVertexAttribArray(1);
 
     /* texture data loading */
-    m_textureLocation = glGetUniformLocation(m_shaderProgram,  VERTEX_TEXTURE_LOCATION);
+    m_textureLocation = glGetUniformLocation(m_shaderProgram, VERTEX_TEXTURE_LOCATION);
     loadTextures(renderable.getMaterials());
 
     /* cleanup */

@@ -13,6 +13,8 @@
 #define TRANSFORM_LOCATION "transform"
 
 constexpr float BACKGROUND_COLOR[] = {0.1f, 0.1f, 0.15f, 1.0f};
+constexpr float DEFAULT_MOVEMENT_SPEED = 5.0f;
+constexpr float DEFAULT_ROTATION_SPEED = 1.0f;
 
 enum class ShaderLoadable {
     BASIC_VERT,
