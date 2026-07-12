@@ -28,6 +28,7 @@ public:
 	void toggleWireframe() override {this->m_isWireframe = !this->m_isWireframe;}
 	void toggleTexture() override {this->m_isTexture = !this->m_isTexture;}
 	void toggleRotation() override {this->m_isRotating = !this->m_isRotating;}
+	void updatePos(const MovementDirection dir, const float deltaTime) override;
 
 private:
 	unsigned int									m_shaderProgram;
@@ -41,8 +42,11 @@ private:
 	bool											m_isWireframe;
 	bool											m_isTexture;
 	bool											m_isRotating;
-	unsigned char 									*m_diffuseTextureData;
-	std::unordered_map<std::string, unsigned int>    m_textures;
+	vec3                                            m_objectPos;
+	float                                           m_movementSpeed;
+	float                                           m_rotationAngle;
+	float                                           m_rotationSpeed;
+	std::unordered_map<std::string, unsigned int>   m_textures;
 
 	void			loadTextures(const std::unordered_map<std::string, Material>& materials);
 	unsigned int 	loadTexture(const std::string& path);

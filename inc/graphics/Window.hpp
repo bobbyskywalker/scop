@@ -24,7 +24,8 @@ private:
 	GLFWwindow* m_window;
 	Object3d& 	m_renderable;
 	Engine* 	m_engine;
+	float       m_deltaTime;
 
 	void cleanGlfw();
-	void processInput();
+	void processMovementInput();
 };

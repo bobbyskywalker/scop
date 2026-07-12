@@ -1,5 +1,6 @@
 #include "glad/glad.h"
 #include "graphics/Window.hpp"
+#include "graphics/engine/Engine.hpp"
 #include "graphics/engine/OpenGLEngine.hpp"
 #include "GLFW/glfw3.h"
 #include <cmath>
@@ -7,7 +8,7 @@
 #include <iostream>
 
 // todo: window resizing
-Window::Window(Object3d& renderable) : m_renderable(renderable), m_engine(nullptr) {
+Window::Window(Object3d& renderable) : m_renderable(renderable), m_engine(nullptr), m_deltaTime(0.0f) {
 	if (!glfwInit()) {
 		std::cerr << "Error: GLFW initialization failure" << std::endl;
 		std::exit(1);
@@ -35,11 +36,25 @@ Window::Window(Object3d& renderable) : m_renderable(renderable), m_engine(nullpt
 Window::~Window() {}
 
 void Window::run() {
+    double lastTime = glfwGetTime();
+
     while (!glfwWindowShouldClose(m_window)) {
-   		this->m_engine->render(this->m_renderable, glfwGetTime(), (float)WINDOW_WIDTH/(float) WINDOW_HEIGHT);
+        double currentTime = glfwGetTime();
+        m_deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+
+        processMovementInput();
+
+        this->m_engine->render(
+            this->m_renderable,
+            m_deltaTime,
+            (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT
+        );
+
         glfwSwapBuffers(m_window);
         glfwPollEvents();
     }
+
     cleanGlfw();
 }
 
@@ -50,7 +65,7 @@ void Window::key_callback(GLFWwindow* window, int key, int scancode, int action,
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
-    if (key == GLFW_KEY_W && action == GLFW_PRESS) {
+    if (key == GLFW_KEY_F && action == GLFW_PRESS) {
     	win->m_engine->toggleWireframe();
     }
     if (key == GLFW_KEY_T && action == GLFW_PRESS) {
@@ -61,15 +76,19 @@ void Window::key_callback(GLFWwindow* window, int key, int scancode, int action,
     }
 }
 
-void Window::processInput() {
-	if(glfwGetKey(this->m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(this->m_window, true);
-	if (glfwGetKey(this->m_window, GLFW_KEY_W) == GLFW_PRESS)
-		this->m_engine->toggleWireframe();
-	if (glfwGetKey(this->m_window, GLFW_KEY_T) == GLFW_PRESS)
-		this->m_engine->toggleTexture();
-	if (glfwGetKey(this->m_window, GLFW_KEY_SPACE) == GLFW_PRESS)
-		this->m_engine->toggleRotation();
+void Window::processMovementInput() {
+    if (glfwGetKey(m_window, GLFW_KEY_LEFT) == GLFW_PRESS)
+        m_engine->updatePos(Engine::MovementDirection::LEFT, m_deltaTime);
+    if (glfwGetKey(m_window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+        m_engine->updatePos(Engine::MovementDirection::RIGHT, m_deltaTime);
+    if (glfwGetKey(m_window, GLFW_KEY_UP) == GLFW_PRESS)
+        m_engine->updatePos(Engine::MovementDirection::UP, m_deltaTime);
+    if (glfwGetKey(m_window, GLFW_KEY_DOWN) == GLFW_PRESS)
+        m_engine->updatePos(Engine::MovementDirection::DOWN, m_deltaTime);
+    if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
+        m_engine->updatePos(Engine::MovementDirection::FORWARD, m_deltaTime);
+    if (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS)
+        m_engine->updatePos(Engine::MovementDirection::BACKWARD, m_deltaTime);
 }
 
 void Window::error_callback(int error, const char* description) {

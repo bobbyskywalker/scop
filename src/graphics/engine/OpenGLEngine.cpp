@@ -1,5 +1,6 @@
 #include "graphics/engine/OpenGLEngine.hpp"
 #include "exception/textures/TextureDataLoadingException.hpp"
+#include "graphics/engine/Engine.hpp"
 #include "graphics/engine/texture.hpp"
 #include "exception/shaders/MissingShaderFileException.hpp"
 #include "exception/shaders/ShaderCompilationException.hpp"
@@ -25,6 +26,10 @@ OpenGlEngine::OpenGlEngine(const Object3d& renderable) {
 	m_isWireframe = false;
 	m_isTexture = false;
 	m_isRotating = false;
+	m_objectPos = {0.0f, 0.0f, 0.0f};
+	m_movementSpeed = 5.0f;
+	m_rotationAngle = 0.0f;
+	m_rotationSpeed = 1.0f;
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -86,6 +91,10 @@ OpenGlEngine::OpenGlEngine(const Object3d& renderable) {
 OpenGlEngine::~OpenGlEngine() {}
 
 void OpenGlEngine::render(const Object3d& renderable, const float deltaTime, const float aspect) {
+    if (m_isRotating) {
+        m_rotationAngle += m_rotationSpeed * deltaTime;
+    }
+
 	glClearColor(BACKGROUND_COLOR[0], BACKGROUND_COLOR[1], BACKGROUND_COLOR[2], BACKGROUND_COLOR[3]);
    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -224,9 +233,39 @@ unsigned int OpenGlEngine::loadTexture(const std::string& path) {
 // rotation over main symmetry axis
 // constant definition
 // object movement
-mat4 OpenGlEngine::buildMvp(const float deltaTime, const float aspect) {
-	mat4 proj = perspective(45.0f * M_PI / 180.0f, aspect, 0.1f, 100.0f);
-    mat4 view = translate({0.0f, 0.0f, -5.0f});
-    mat4 model = m_isRotating ? rotateY(deltaTime * 0.5f) : mat_identity();
+mat4 OpenGlEngine::buildMvp(const float deltaTime, const float aspect)
+{
+    (void) deltaTime;
+    mat4 proj = perspective(45.0f * M_PI / 180.0f, aspect, 0.1f, 100.0f);
+    mat4 view = translate({0.0f, 0.0f, -10.0f});
+
+    mat4 model = translate(m_objectPos);
+
+    if (m_isRotating)
+        model = mat_multiply(model, rotateY(m_rotationAngle));
+
     return mat_multiply(proj, mat_multiply(view, model));
+}
+
+void OpenGlEngine::updatePos(const MovementDirection dir, const float deltaTime) {
+    switch (dir) {
+        case Engine::MovementDirection::LEFT:
+            this->m_objectPos.x -= m_movementSpeed * deltaTime;
+            break;
+        case Engine::MovementDirection::RIGHT:
+            this->m_objectPos.x += m_movementSpeed * deltaTime;
+            break;
+        case Engine::MovementDirection::UP:
+            this->m_objectPos.y += m_movementSpeed * deltaTime;
+            break;
+        case Engine::MovementDirection::DOWN:
+            this->m_objectPos.y -= m_movementSpeed * deltaTime;
+            break;
+        case Engine::MovementDirection::FORWARD:
+            this->m_objectPos.z += m_movementSpeed * deltaTime;
+            break;
+        case Engine::MovementDirection::BACKWARD:
+            this->m_objectPos.z -= m_movementSpeed * deltaTime;
+            break;
+    }
 }
