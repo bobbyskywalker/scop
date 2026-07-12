@@ -6,12 +6,11 @@
 #include "exception/shaders/ShaderCompilationException.hpp"
 #include "exception/shaders/ShaderLinkingErrorException.hpp"
 #include "graphics/engine/texture.hpp"
+#include "util.hpp"
 #include "glad/glad.h"
-#include <cmath>
 #include <fstream>
 #include <cstdarg>
 #include "math/math3d.h"
-#define _USE_MATH_DEFINES
 
 const std::string getShaderFilename(const ShaderLoadable shader) {
     if (shader == ShaderLoadable::BASIC_VERT) {
@@ -27,9 +26,9 @@ OpenGlEngine::OpenGlEngine(const Object3d& renderable):
     m_isTexture(false),
     m_isRotating(false),
     m_objectPos({0.0f, 0.0f, 0.0f}),
-    m_movementSpeed(DEFAULT_MOVEMENT_SPEED),
+    m_movementSpeed(Speeds::DEFAULT_MOVEMENT_SPEED),
     m_rotationAngle(0.0f),
-    m_rotationSpeed(DEFAULT_ROTATION_SPEED)
+    m_rotationSpeed(Speeds::DEFAULT_ROTATION_SPEED)
 {
 	glEnable(GL_DEPTH_TEST);
 
@@ -95,11 +94,16 @@ void OpenGlEngine::render(const Object3d& renderable, const float deltaTime, con
         m_rotationAngle += m_rotationSpeed * deltaTime;
     }
 
-	glClearColor(BACKGROUND_COLOR[0], BACKGROUND_COLOR[1], BACKGROUND_COLOR[2], BACKGROUND_COLOR[3]);
+	glClearColor(
+	    Properties::BACKGROUND_COLOR[0],
+		Properties::BACKGROUND_COLOR[1],
+	    Properties::BACKGROUND_COLOR[2],
+		Properties::BACKGROUND_COLOR[3]
+	);
    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(m_shaderProgram);
-    mat4 mvp = buildMvp(aspect);
+    mat4 mvp = buildMvp(aspect, toVec3(renderable.getObjectCenter()));
     glUniformMatrix4fv(m_transformLocation, 1, GL_TRUE, &mvp.matrix[0][0]);
 
 	this->m_isWireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -229,14 +233,17 @@ unsigned int OpenGlEngine::loadTexture(const std::string& path) {
     return textureID;
 }
 
-// TODO:
-// rotation over main symmetry axis
-// constant definition
-mat4 OpenGlEngine::buildMvp(const float aspect) {
-    mat4 proj = perspective(45.0f * M_PI / 180.0f, aspect, 0.1f, 100.0f);
-    mat4 view = translate({0.0f, 0.0f, -5.0f});
+mat4 OpenGlEngine::buildMvp(const float aspect, vec3 objectCenter) {
+    mat4 proj = perspective(Camera::FOV, aspect, Camera::NEAR, Camera::FAR);
+    mat4 view = translate({0.0f, 0.0f, Camera::Z_POSITION});
     mat4 model = translate(m_objectPos);
+    /* main axis rotation recipe:
+     * move obj center to origin -> rotate -> move back
+     */
+    model = mat_multiply(model, translate(objectCenter));
     model = mat_multiply(model, rotateY(m_rotationAngle));
+    model = mat_multiply(model, translate(negate(objectCenter)));
+
     return mat_multiply(proj, mat_multiply(view, model));
 }
 

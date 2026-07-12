@@ -14,6 +14,7 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
+#include <limits>
 
 ObjType getObjTokenType(const std::string& token) {
     if (token == "v") return ObjType::VERTEX;
@@ -29,7 +30,9 @@ ObjType getObjTokenType(const std::string& token) {
 }
 
 Object3d::Object3d(const std::string& filename) : m_currentMaterialID("") {
+    initBounds();
 	loadObjFromFile(filename);
+	calcObjectCenterFromBounds();
 }
 
 Object3d::~Object3d() {}
@@ -120,7 +123,18 @@ void Object3d::parseVertex(const std::vector<std::string>& tokens) {
 		std::stof(tokens[2]),
 		std::stof(tokens[3])
 	);
+	updateBoundingBox(v);
 	this->m_vertices.push_back(v);
+}
+
+void Object3d::updateBoundingBox(const Vertex& vec) {
+    m_minBounds[0] = std::min(m_minBounds[0], vec.x);
+    m_minBounds[1] = std::min(m_minBounds[1], vec.y);
+    m_minBounds[2] = std::min(m_minBounds[2], vec.z);
+
+    m_maxBounds[0] = std::max(m_maxBounds[0], vec.x);
+    m_maxBounds[1] = std::max(m_maxBounds[1], vec.y);
+    m_maxBounds[2] = std::max(m_maxBounds[2], vec.z);
 }
 
 void Object3d::parseTexCoord(const std::vector<std::string>& tokens) {
@@ -261,37 +275,23 @@ void Object3d::buildRenderBatches() {
     }
 }
 
-void Object3d::printObject() const {
-    for (std::size_t i = 0; i < m_vertices.size(); i++) {
-        std::cout << "Vertex " << i+1 << ": ("
-                  << m_vertices[i].x << ", "
-                  << m_vertices[i].y << ", "
-                  << m_vertices[i].z << ")" << std::endl;
-    }
+void Object3d::initBounds() {
+    m_minBounds = {
+           std::numeric_limits<float>::max(),
+           std::numeric_limits<float>::max(),
+           std::numeric_limits<float>::max()
+    };
+    m_maxBounds = {
+           std::numeric_limits<float>::lowest(),
+           std::numeric_limits<float>::lowest(),
+           std::numeric_limits<float>::lowest()
+    };
+}
 
-    for (std::size_t i = 0; i < m_texcoords.size(); i++) {
-        std::cout << "TexCoord " << i+1 << ": ("
-                  << m_texcoords[i].u << ", "
-                  << m_texcoords[i].v << ")" << std::endl;
-    }
-
-    for (std::size_t i = 0; i < m_normals.size(); i++) {
-        std::cout << "Normal " << i+1 << ": ("
-                  << m_normals[i].nx << ", "
-                  << m_normals[i].ny << ", "
-                  << m_normals[i].nz << ")" << std::endl;
-    }
-
-    for (std::size_t i = 0; i < m_triangles.size(); i++) {
-        std::cout << "Triangle " << i+1 << ": vertices ["
-                  << m_triangles[i].verticesId[0] << ", "
-                  << m_triangles[i].verticesId[1] << ", "
-                  << m_triangles[i].verticesId[2] << "] texCoords ["
-                  << m_triangles[i].texCordIdx[0] << ", "
-                  << m_triangles[i].texCordIdx[1] << ", "
-                  << m_triangles[i].texCordIdx[2] << "] normals ["
-                  << m_triangles[i].normalIdx[0] << ", "
-                  << m_triangles[i].normalIdx[1] << ", "
-                  << m_triangles[i].normalIdx[2] << "]" << std::endl;
-    }
+void Object3d::calcObjectCenterFromBounds() {
+   	m_objectCenter = {
+        (m_minBounds[0] + m_maxBounds[0]) / 2.0f,
+        (m_minBounds[1] + m_maxBounds[1]) / 2.0f,
+        (m_minBounds[2] + m_maxBounds[2]) / 2.0f
+    };
 }

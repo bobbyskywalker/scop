@@ -129,6 +129,8 @@ public:
      	return data;
 	}
 
+	const std::vector<float> getObjectCenter() const { return this->m_objectCenter; }
+
 	std::unordered_map<std::string, Material> getMaterials() const { return this->m_materials; }
 
 	const std::vector<RenderBatch> getRenderBatches() const { return this->m_renderBatches; }
@@ -143,7 +145,13 @@ private:
     std::string 								m_currentMaterialID;
     std::unordered_map<std::string, Material> 	m_materials;
     std::vector<RenderBatch>					m_renderBatches;
+    std::vector<float>                          m_minBounds;
+    std::vector<float>                          m_maxBounds;
+    std::vector<float>                          m_objectCenter;
 
+    void initBounds();
+    void updateBoundingBox(const Vertex& vec);
+    void calcObjectCenterFromBounds();
     bool parseLine(const int lineIdx, const std::string& line);
     void parseVertex(const std::vector<std::string>& tokens);
     void parseTexCoord(const std::vector<std::string>& tokens);

@@ -2,9 +2,11 @@
 
 #include <string>
 #include <unordered_map>
+#include <cmath>
 #include "math/math3d.h"
 #include "model/Object3d.hpp"
 #include "Engine.hpp"
+#define _USE_MATH_DEFINES
 
 #define BASE_SHADER_LOCATION "./src/graphics/shaders/"
 #define VERTEX_COLOR_LOCATION "u_color"
@@ -12,9 +14,21 @@
 #define BLENDING_LOCATION "u_blend"
 #define TRANSFORM_LOCATION "transform"
 
-constexpr float BACKGROUND_COLOR[] = {0.1f, 0.1f, 0.15f, 1.0f};
-constexpr float DEFAULT_MOVEMENT_SPEED = 5.0f;
-constexpr float DEFAULT_ROTATION_SPEED = 1.0f;
+namespace Camera {
+    constexpr float FOV = 45.0f * M_PI / 180.0f;
+    constexpr float NEAR = 0.1f;
+    constexpr float FAR = 100.0f;
+    constexpr float Z_POSITION = -5.0f;
+}
+
+namespace Speeds {
+    constexpr float DEFAULT_MOVEMENT_SPEED = 5.0f;
+    constexpr float DEFAULT_ROTATION_SPEED = 1.0f;
+}
+
+namespace Properties {
+    constexpr float BACKGROUND_COLOR[] = {0.1f, 0.1f, 0.15f, 1.0f};
+}
 
 enum class ShaderLoadable {
     BASIC_VERT,
@@ -57,5 +71,5 @@ private:
 	std::string 	loadShader(const ShaderLoadable shader);
 	void 			renderBatch(const Object3d& renderable, const RenderBatch& currentBatch);
 	void 			applySelectedColorMode(const std::vector<float>& diffuseColor, float blendingLevel);
-	mat4			buildMvp(const float aspect);
+	mat4			buildMvp(const float aspect, vec3 objectCenter);
 };
