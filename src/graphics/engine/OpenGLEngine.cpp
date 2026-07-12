@@ -99,7 +99,7 @@ void OpenGlEngine::render(const Object3d& renderable, const float deltaTime, con
    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(m_shaderProgram);
-    mat4 mvp = buildMvp(deltaTime, aspect);
+    mat4 mvp = buildMvp(aspect);
     glUniformMatrix4fv(m_transformLocation, 1, GL_TRUE, &mvp.matrix[0][0]);
 
 	this->m_isWireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -232,18 +232,11 @@ unsigned int OpenGlEngine::loadTexture(const std::string& path) {
 // TODO:
 // rotation over main symmetry axis
 // constant definition
-// object movement
-mat4 OpenGlEngine::buildMvp(const float deltaTime, const float aspect)
-{
-    (void) deltaTime;
+mat4 OpenGlEngine::buildMvp(const float aspect) {
     mat4 proj = perspective(45.0f * M_PI / 180.0f, aspect, 0.1f, 100.0f);
-    mat4 view = translate({0.0f, 0.0f, -10.0f});
-
+    mat4 view = translate({0.0f, 0.0f, -5.0f});
     mat4 model = translate(m_objectPos);
-
-    if (m_isRotating)
-        model = mat_multiply(model, rotateY(m_rotationAngle));
-
+    model = mat_multiply(model, rotateY(m_rotationAngle));
     return mat_multiply(proj, mat_multiply(view, model));
 }
 

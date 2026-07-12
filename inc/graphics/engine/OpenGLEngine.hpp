@@ -55,5 +55,5 @@ private:
 	std::string 	loadShader(const ShaderLoadable shader);
 	void 			renderBatch(const Object3d& renderable, const RenderBatch& currentBatch);
 	void 			applySelectedColorMode(const std::vector<float>& diffuseColor, float blendingLevel);
-	mat4			buildMvp(const float deltaTime, const float aspect);
+	mat4			buildMvp(const float aspect);
 };
