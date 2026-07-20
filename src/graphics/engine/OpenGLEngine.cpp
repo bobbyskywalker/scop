@@ -51,14 +51,14 @@ OpenGlEngine::OpenGlEngine(const Object3d& renderable):
     glGenBuffers(1, &m_VBO);
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 
-    auto vertices = renderable.getVerticesWithUVMappingArray();
+    auto vertices = renderable.getRenderVerticesArray();
     glBufferData(GL_ARRAY_BUFFER,
                  vertices.size() * sizeof(float),
                  vertices.data(),
                  GL_STATIC_DRAW
     );
 
-    auto indices = renderable.getIndices();
+    auto indices = renderable.getRenderIndices();
     glGenBuffers(1, &m_EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,

@@ -85,49 +85,11 @@ public:
 
 	const std::vector<Vertex> getVertices() const { return this->m_vertices; }
 
-	const std::vector<float> getVerticesFlat() const {
-		std::vector<float> vertexData;
-    	for (const auto& v : getVertices()) {
-	        vertexData.push_back(v.x);
-	        vertexData.push_back(v.y);
-	        vertexData.push_back(v.z);
-	    }
-		return vertexData;
-	}
-
 	std::vector<TexCoord> getTexCoords() const { return this->m_texcoords; }
 
 	std::vector<Normal> getNormals() const { return this->m_normals; }
 
 	std::vector<Triangle> getTriangles() const { return this->m_triangles; }
-
-	std::vector<unsigned int> getIndices() const {
-	    std::vector<unsigned int> idx;
-	    for (const auto& tri : m_triangles) {
-	        idx.push_back(tri.verticesId[0]);
-	        idx.push_back(tri.verticesId[1]);
-	        idx.push_back(tri.verticesId[2]);
-	    }
-	    return idx;
-	}
-
-	std::vector<float> getVerticesWithUVMappingArray() const {
-		std::vector<float> data;
-    	for (size_t i = 0; i < m_vertices.size(); i++) {
-     		data.push_back(m_vertices[i].x);
-         	data.push_back(m_vertices[i].y);
-          	data.push_back(m_vertices[i].z);
-
-           if (i < m_texcoords.size()) {
-            	data.push_back(m_texcoords[i].u);
-             	data.push_back(-m_texcoords[i].v);
-           } else {
-            	data.push_back(0.0f);
-             	data.push_back(0.0f);
-           }
-     	}
-     	return data;
-	}
 
 	const std::vector<float> getObjectCenter() const { return this->m_objectCenter; }
 
@@ -135,7 +97,9 @@ public:
 
 	const std::vector<RenderBatch> getRenderBatches() const { return this->m_renderBatches; }
 
-	void printObject() const;
+	std::vector<unsigned int> getRenderIndices() const;
+
+	std::vector<float> getRenderVerticesArray() const;
 
 private:
 	std::vector<Vertex>             			m_vertices;

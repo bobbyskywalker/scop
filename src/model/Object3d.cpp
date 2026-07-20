@@ -295,3 +295,43 @@ void Object3d::calcObjectCenterFromBounds() {
         (m_minBounds[2] + m_maxBounds[2]) / 2.0f
     };
 }
+
+std::vector<unsigned int> Object3d::getRenderIndices() const {
+	std::vector<unsigned int> indices;
+	for (unsigned int i = 0; i < m_triangles.size() * 3; i++) {
+		indices.push_back(i);
+	}
+	return indices;
+}
+
+/* todo generate procedurally the textures if not specified generated UV
+
+float u = (v.x - m_minBounds[0]) /
+          (m_maxBounds[0] - m_minBounds[0]);
+
+float vv = (v.z - m_minBounds[2]) /
+           (m_maxBounds[2] - m_minBounds[2]);
+*/
+std::vector<float> Object3d::getRenderVerticesArray() const {
+	std::vector<float> data;
+
+	for (const auto& tri : m_triangles) {
+		for (int i = 0; i < 3; i++) {
+			const Vertex& v = m_vertices[tri.verticesId[i]];
+			data.push_back(v.x);
+			data.push_back(v.y);
+			data.push_back(v.z);
+
+			if (tri.texCordIdx[i] >= 0) {
+				const TexCoord& uv = m_texcoords[tri.texCordIdx[i]];
+
+				data.push_back(uv.u);
+				data.push_back(uv.v);
+			} else {
+				data.push_back(0.0f);
+				data.push_back(0.0f);
+			}
+		}
+	}
+	return data;
+}
