@@ -1,0 +1,5 @@
+# 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware # File Created: 01.06.2011 15:16:32
+
+newmtl _10778_Toilet_V201___Default
+Kd 0.5880 0.5880 0.5880
+map_Kd resources/toilet/Toilet.jpg

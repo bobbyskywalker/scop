@@ -2,7 +2,7 @@
 # Material Count: 1
 
 newmtl Material
-map_Kd resources/redbrick.jpg
+map_Kd resources/textures/redbrick.jpg
 Ns 96.078431
 Ka 0.000000 0.000000 0.000000
 Kd 0.640000 0.640000 0.640000
