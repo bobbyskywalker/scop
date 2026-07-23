@@ -49,6 +49,7 @@ std::unordered_map<std::string, Material>
 MaterialLoader::parseMaterials(const std::string &filename) {
     int idx = 1;
     std::string line;
+
     std::ifstream mtlFile(filename);
 
     std::unordered_map<std::string, Material> materials;
@@ -84,7 +85,7 @@ bool MaterialLoader::parseLine(
     Material& currentMaterial
 ) {
     try {
-        if (!line.empty()) {
+        if (line.find_first_not_of(" \t\r") != std::string::npos) {
             std::vector<std::string> tokens = split(line, ' ', false);
             MtlType type = getMtlTokenType(tokens.at(0));
 
