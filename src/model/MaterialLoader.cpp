@@ -85,7 +85,7 @@ bool MaterialLoader::parseLine(
 ) {
     try {
         if (!line.empty()) {
-            std::vector<std::string> tokens = split(line, ' ');
+            std::vector<std::string> tokens = split(line, ' ', false);
             MtlType type = getMtlTokenType(tokens.at(0));
 
             switch (type) {

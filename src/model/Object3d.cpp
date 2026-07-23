@@ -68,8 +68,8 @@ void Object3d::loadObjFromFile(const std::string& filename) {
 
 bool Object3d::parseLine(const int lineIdx, const std::string& line) {
 	try {
-		if (!line.empty()) {
-			std::vector<std::string> tokens = split(line, ' ');
+		if (line.find_first_not_of(" \t\r") != std::string::npos) {
+			std::vector<std::string> tokens = split(line, ' ', false);
 			switch (getObjTokenType(tokens.at(0))) {
 				case ObjType::VERTEX:
 					parseVertex(tokens);
@@ -190,7 +190,7 @@ void Object3d::parseFace(const std::vector<std::string>& tokens) {
 
 template<typename T>
 void Object3d::parseFaceTokenIndices(T& shape, const int pos, const std::string& indicesStr) {
-    std::vector<std::string> indices = split(indicesStr, FACE_TOKEN_DELIMITER);
+    std::vector<std::string> indices = split(indicesStr, FACE_TOKEN_DELIMITER, true);
 
     shape.verticesId[pos] = std::stoi(indices[0]) - 1;
 
