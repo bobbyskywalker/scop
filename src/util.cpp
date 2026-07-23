@@ -22,3 +22,7 @@ vec3 toVec3(const std::vector<float>& vec) {
 vec3 negate(const vec3& vec) {
     return {-vec.x,-vec.y,-vec.z};
 }
+
+float normalizeLinear(float against, float maxBound, float minBound) {
+	return (against - minBound) / (maxBound - minBound);
+}

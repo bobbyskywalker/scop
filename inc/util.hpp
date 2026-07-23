@@ -8,3 +8,4 @@
 std::vector<std::string> split(const std::string& s, char delim);
 vec3 toVec3(const std::vector<float>& vec);
 vec3 negate(const vec3& vec);
+float normalizeLinear(float against, float maxBound, float minBound);

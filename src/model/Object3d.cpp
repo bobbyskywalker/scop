@@ -304,14 +304,6 @@ std::vector<unsigned int> Object3d::getRenderIndices() const {
 	return indices;
 }
 
-/* todo generate procedurally the textures if not specified generated UV
-
-float u = (v.x - m_minBounds[0]) /
-          (m_maxBounds[0] - m_minBounds[0]);
-
-float vv = (v.z - m_minBounds[2]) /
-           (m_maxBounds[2] - m_minBounds[2]);
-*/
 std::vector<float> Object3d::getRenderVerticesArray() const {
 	std::vector<float> data;
 
@@ -324,12 +316,12 @@ std::vector<float> Object3d::getRenderVerticesArray() const {
 
 			if (tri.texCordIdx[i] >= 0) {
 				const TexCoord& uv = m_texcoords[tri.texCordIdx[i]];
-
 				data.push_back(uv.u);
 				data.push_back(uv.v);
 			} else {
-				data.push_back(0.0f);
-				data.push_back(0.0f);
+				/* procedurally mapped UV's */
+				data.push_back(normalizeLinear(v.x, m_maxBounds[0], m_minBounds[0]));
+				data.push_back(normalizeLinear(v.z, m_maxBounds[2], m_minBounds[2]));
 			}
 		}
 	}
