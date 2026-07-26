@@ -1,0 +1,83 @@
+{
+   X11_locale_reachable
+   Memcheck:Leak
+   match-leak-kinds:reachable
+   fun:malloc
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_Xlc*
+}
+
+{
+   X11_XrmGetStringDatabase
+   Memcheck:Leak
+   match-leak-kinds:reachable
+   fun:malloc
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+}
+
+{
+   X11_reachable
+   Memcheck:Leak
+   match-leak-kinds:reachable
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+}
+
+{
+   GLFW_X11_GLX_dlclose
+   Memcheck:Leak
+   match-leak-kinds:reachable
+   fun:malloc
+   fun:_dl_close_worker.part.0
+   fun:_dl_close_worker
+   fun:_dl_close
+   fun:dlclose@@GLIBC_2.34
+   fun:_glfwPlatformFreeModule
+   fun:_glfwTerminateGLX
+   fun:_glfwTerminateX11
+   fun:glfwTerminate
+}
+
+{
+   NVIDIA_realloc_zero
+   Memcheck:ReallocZero
+   fun:realloc
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so*
+}
+
+{
+   NVIDIA_posix_memalign_zero
+   Memcheck:BadSize
+   fun:posix_memalign
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so*
+}
+
+{
+   DBus_definite
+   Memcheck:Leak
+   match-leak-kinds:definite
+   fun:calloc
+   obj:/usr/lib/x86_64-linux-gnu/libdbus-1.so*
+   fun:_dbus_message_loader_queue_messages
+}
+
+{
+   DBus_reachable
+   Memcheck:Leak
+   match-leak-kinds:reachable
+   obj:/usr/lib/x86_64-linux-gnu/libdbus-1.so*
+}
+
+{
+   dynamic_loader
+   Memcheck:Leak
+   match-leak-kinds:reachable
+   fun:_dl_new_object
+}
+
+{
+   dynamic_loader_cache
+   Memcheck:Leak
+   match-leak-kinds:reachable
+   fun:_dl_load_cache_lookup
+}

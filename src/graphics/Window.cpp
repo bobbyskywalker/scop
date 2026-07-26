@@ -97,7 +97,7 @@ void Window::error_callback(int error, const char* description) {
 }
 
 void Window::cleanGlfw() {
-	glfwDestroyWindow(this->m_window);
-	glfwTerminate();
-	delete this->m_engine;
+    delete this->m_engine;
+    glfwDestroyWindow(this->m_window);
+    glfwTerminate();
 }
