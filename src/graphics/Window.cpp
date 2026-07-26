@@ -7,14 +7,20 @@
 #include <cstddef>
 #include <iostream>
 
-// todo: window resizing
-Window::Window(Object3d& renderable) : m_renderable(renderable), m_engine(nullptr), m_deltaTime(0.0f) {
+Window::Window(Object3d& renderable) :
+	m_renderable(renderable),
+	m_engine(nullptr),
+	m_deltaTime(0.0f),
+	m_currentWindowWidth(DEFAULT_WINDOW_WIDTH),
+	m_currentWindowHeight(DEFAULT_WINDOW_HEIGHT)
+ {
 	if (!glfwInit()) {
 		std::cerr << "Error: GLFW initialization failure" << std::endl;
 		std::exit(1);
 	}
 	glfwSetErrorCallback(Window::error_callback);
-	this->m_window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "scop", NULL, NULL);
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+	this->m_window = glfwCreateWindow(m_currentWindowWidth, m_currentWindowHeight, "scop", NULL, NULL);
 	if (!this->m_window) {
 		std::cerr << "Error: GLFW window creation failure" << std::endl;
 		std::exit(1);
@@ -24,12 +30,13 @@ Window::Window(Object3d& renderable) : m_renderable(renderable), m_engine(nullpt
 
 	glfwSetWindowUserPointer(m_window, this);
 	glfwSetKeyCallback(m_window, key_callback);
+	glfwSetFramebufferSizeCallback(m_window, framebuffer_size_callback);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cerr << "Error: GLAD initialization failure" << std::endl;
         std::exit(1);
     }
-	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+	glViewport(0, 0, m_currentWindowWidth, m_currentWindowHeight);
 	this->m_engine = new OpenGlEngine(renderable);
 }
 
@@ -45,10 +52,15 @@ void Window::run() {
 
         processMovementInput();
 
+        float aspect = 1.0f;
+        if (m_currentWindowHeight > 0) {
+       		aspect = static_cast<float>(m_currentWindowWidth) / static_cast<float>(m_currentWindowHeight);
+        }
+
         this->m_engine->render(
             this->m_renderable,
             m_deltaTime,
-            (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT
+            aspect
         );
 
         glfwSwapBuffers(m_window);
@@ -74,6 +86,15 @@ void Window::key_callback(GLFWwindow* window, int key, int scancode, int action,
     if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
         win->m_engine->toggleRotation();
     }
+}
+
+void Window::framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+    Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+    win->m_currentWindowWidth = width;
+    win->m_currentWindowHeight = height;
+
+    glViewport(0, 0, width, height);
 }
 
 void Window::processMovementInput() {
