@@ -8,11 +8,11 @@
 #include "Engine.hpp"
 #define _USE_MATH_DEFINES
 
-#define BASE_SHADER_LOCATION "./src/graphics/shaders/"
-#define VERTEX_COLOR_LOCATION "u_color"
-#define VERTEX_TEXTURE_LOCATION "m_texture"
-#define BLENDING_LOCATION "u_blend"
-#define TRANSFORM_LOCATION "transform"
+constexpr const char* BASE_SHADER_LOCATION = "./src/graphics/shaders/";
+constexpr const char* VERTEX_COLOR_LOCATION = "u_color";
+constexpr const char* VERTEX_TEXTURE_LOCATION = "m_texture";
+constexpr const char* BLENDING_LOCATION = "u_blend";
+constexpr const char* TRANSFORM_LOCATION = "transform";
 
 namespace Camera {
     constexpr float FOV = 45.0f * M_PI / 180.0f;
@@ -37,8 +37,7 @@ enum class ShaderLoadable {
 
 class OpenGlEngine: public Engine {
 public:
-	OpenGlEngine(const Object3d &renderable);
-	~OpenGlEngine() override;
+	explicit OpenGlEngine(const Object3d &renderable);
 
 	void render(const Object3d& renderable, const float deltaTime, const float aspect) override;
 	void toggleWireframe() override {this->m_isWireframe = !this->m_isWireframe;}
@@ -64,12 +63,12 @@ private:
 	float                                           m_rotationSpeed;
 	std::unordered_map<std::string, unsigned int>   m_textures;
 
-	void			loadTextures(const std::unordered_map<std::string, Material>& materials);
-	unsigned int 	loadTexture(const std::string& path);
-	unsigned int 	linkShaders(unsigned int shaders...);
-	unsigned int 	compileShader(const ShaderLoadable shaderFile, const int shaderType);
-	std::string 	loadShader(const ShaderLoadable shader);
-	void 			renderBatch(const Object3d& renderable, const RenderBatch& currentBatch);
-	void 			applySelectedColorMode(const std::vector<float>& diffuseColor, float blendingLevel);
-	mat4			buildMvp(const float aspect, vec3 objectCenter);
+	void			            loadTextures(const std::unordered_map<std::string, Material>& materials);
+	[[nodiscard]] unsigned int  loadTexture(const std::string& path);
+	[[nodiscard]] unsigned int 	linkShaders(unsigned int shaders...);
+	[[nodiscard]] unsigned int 	compileShader(const ShaderLoadable shaderFile, const int shaderType);
+	[[nodiscard]] std::string 	loadShader(const ShaderLoadable shader);
+	void 			            renderBatch(const Object3d& renderable, const RenderBatch& currentBatch);
+	void 			            applySelectedColorMode(const std::vector<float>& diffuseColor, float blendingLevel);
+	[[nodiscard]] mat4			buildMvp(const float aspect, vec3 objectCenter);
 };

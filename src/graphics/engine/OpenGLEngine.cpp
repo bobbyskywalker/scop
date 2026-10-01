@@ -33,8 +33,8 @@ OpenGlEngine::OpenGlEngine(const Object3d& renderable):
 	glEnable(GL_DEPTH_TEST);
 
 	/* compile shaders */
-    unsigned int vertexShader = compileShader(ShaderLoadable::BASIC_VERT, GL_VERTEX_SHADER);
-    unsigned int fragmentShader = compileShader(ShaderLoadable::BASIC_FRAG, GL_FRAGMENT_SHADER);
+    const unsigned int vertexShader = compileShader(ShaderLoadable::BASIC_VERT, GL_VERTEX_SHADER);
+    const unsigned int fragmentShader = compileShader(ShaderLoadable::BASIC_FRAG, GL_FRAGMENT_SHADER);
 
     m_shaderProgram = linkShaders(vertexShader, fragmentShader, 0);
     glUseProgram(m_shaderProgram);
@@ -51,14 +51,14 @@ OpenGlEngine::OpenGlEngine(const Object3d& renderable):
     glGenBuffers(1, &m_VBO);
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 
-    auto vertices = renderable.getRenderVerticesArray();
+    const auto vertices = renderable.getRenderVerticesArray();
     glBufferData(GL_ARRAY_BUFFER,
                  vertices.size() * sizeof(float),
                  vertices.data(),
                  GL_STATIC_DRAW
     );
 
-    auto indices = renderable.getRenderIndices();
+    const auto indices = renderable.getRenderIndices();
     glGenBuffers(1, &m_EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
@@ -87,8 +87,6 @@ OpenGlEngine::OpenGlEngine(const Object3d& renderable):
     m_vertexColorLocation = glGetUniformLocation(m_shaderProgram, VERTEX_COLOR_LOCATION);
 }
 
-OpenGlEngine::~OpenGlEngine() {}
-
 void OpenGlEngine::render(const Object3d& renderable, const float deltaTime, const float aspect) {
     if (m_isRotating) {
         m_rotationAngle += m_rotationSpeed * deltaTime;
@@ -103,7 +101,7 @@ void OpenGlEngine::render(const Object3d& renderable, const float deltaTime, con
    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(m_shaderProgram);
-    mat4 mvp = buildMvp(aspect, toVec3(renderable.getObjectCenter()));
+    const mat4 mvp = buildMvp(aspect, toVec3(renderable.getObjectCenter()));
     glUniformMatrix4fv(m_transformLocation, 1, GL_TRUE, &mvp.matrix[0][0]);
 
 	this->m_isWireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -115,7 +113,7 @@ void OpenGlEngine::render(const Object3d& renderable, const float deltaTime, con
 
 void OpenGlEngine::renderBatch(const Object3d& renderable, const RenderBatch& currentBatch) {
     auto mtls = renderable.getMaterials();
-    Material& currentMtl = mtls[currentBatch.materialName];
+    const Material& currentMtl = mtls[currentBatch.materialName];
 
     if (m_isTexture && m_textures.count(currentBatch.materialName)) {
         glActiveTexture(GL_TEXTURE0);
@@ -126,7 +124,7 @@ void OpenGlEngine::renderBatch(const Object3d& renderable, const RenderBatch& cu
     	applySelectedColorMode(currentMtl.getDiffuseColor(), 0.0f);
     }
 
-    auto start = currentBatch.triangleIndices[0] * 3 * sizeof(unsigned int);
+    const auto start = currentBatch.triangleIndices[0] * 3 * sizeof(unsigned int);
     glDrawElements(GL_TRIANGLES, currentBatch.triangleIndices.size() * 3, GL_UNSIGNED_INT, (void*)start);
 }
 
@@ -135,8 +133,8 @@ void OpenGlEngine::applySelectedColorMode(const std::vector<float>& diffuseColor
     glUniform1f(m_blendLocation, blendingLevel);
 }
 
-std::string OpenGlEngine::loadShader(ShaderLoadable shader) {
-    auto path = getShaderFilename(shader);
+[[nodiscard]] std::string OpenGlEngine::loadShader(ShaderLoadable shader) {
+    const auto path = getShaderFilename(shader);
     std::string line,content;
     std::ifstream in(path);
 
@@ -150,7 +148,7 @@ std::string OpenGlEngine::loadShader(ShaderLoadable shader) {
     return content;
 }
 
-unsigned int OpenGlEngine::compileShader(ShaderLoadable shaderFile, int shaderMacro) {
+[[nodiscard]] unsigned int OpenGlEngine::compileShader(ShaderLoadable shaderFile, int shaderMacro) {
     unsigned int shader;
 	std::string shaderSrcStr;
 	const char *shaderSrc;
@@ -172,8 +170,8 @@ unsigned int OpenGlEngine::compileShader(ShaderLoadable shaderFile, int shaderMa
 }
 
 /* accepts a variable number of compiled shaders */
-unsigned int OpenGlEngine::linkShaders(unsigned int shader, ...) {
-    unsigned int shaderProgram = glCreateProgram();
+[[nodiscard]] unsigned int OpenGlEngine::linkShaders(unsigned int shader, ...) {
+    const unsigned int shaderProgram = glCreateProgram();
 
     va_list args;
     va_start(args, shader);
@@ -207,7 +205,7 @@ void OpenGlEngine::loadTextures(const std::unordered_map<std::string, Material>&
 	}
 }
 
-unsigned int OpenGlEngine::loadTexture(const std::string& path) {
+[[nodiscard]] unsigned int OpenGlEngine::loadTexture(const std::string& path) {
     int width, height, nrChannels;
     unsigned char* data = loadTextureData(&width, &height, &nrChannels, path);
     if (!data) {
@@ -233,9 +231,9 @@ unsigned int OpenGlEngine::loadTexture(const std::string& path) {
     return textureID;
 }
 
-mat4 OpenGlEngine::buildMvp(const float aspect, vec3 objectCenter) {
-    mat4 proj = perspective(Camera::FOV, aspect, Camera::NEAR, Camera::FAR);
-    mat4 view = translate({0.0f, 0.0f, Camera::Z_POSITION});
+[[nodiscard]] mat4 OpenGlEngine::buildMvp(const float aspect, vec3 objectCenter) {
+    const mat4 proj = perspective(Camera::FOV, aspect, Camera::NEAR, Camera::FAR);
+    const mat4 view = translate({0.0f, 0.0f, Camera::Z_POSITION});
     mat4 model = translate(m_objectPos);
     /* main axis rotation recipe:
      * move obj center to origin -> rotate -> move back
