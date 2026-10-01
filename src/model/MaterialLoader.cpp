@@ -77,7 +77,7 @@ MaterialLoader::parseMaterials(const std::string &filename) {
     return materials;
 }
 
-bool MaterialLoader::parseLine(
+[[nodiscard]] bool MaterialLoader::parseLine(
     const int lineIdx,
     const std::string& line,
     std::unordered_map<std::string, Material>& materials,
@@ -135,8 +135,8 @@ void MaterialLoader::parseColor(
     if (tokens.size() != 4) {
         throw InvalidColorParamsException("Invalid color definition. Invalid number of arguments.");
     }
-    auto r = std::stof(tokens[1]);
-    auto g = std::stof(tokens[2]);
-    auto b = std::stof(tokens[3]);
+    const auto r = std::stof(tokens[1]);
+    const auto g = std::stof(tokens[2]);
+    const auto b = std::stof(tokens[3]);
     currentMaterial.setDiffuseColor(std::vector<float>{r, g, b});
 }

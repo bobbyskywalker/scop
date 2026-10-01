@@ -41,10 +41,12 @@ public:
     static std::unordered_map<std::string, Material> parseMaterials(const std::string& filename);
 
 private:
+    MaterialLoader() = default;
+
     static void logInfo(const std::string& msg);
     static void logError(const int lineIdx, const std::string& msg);
 
-    static bool parseLine(
+    [[nodiscard]] static bool parseLine(
         const int lineIdx,
         const std::string& line,
         std::unordered_map<std::string, Material>& materials,

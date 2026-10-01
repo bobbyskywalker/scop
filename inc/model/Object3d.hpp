@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <vector>
 
-# define FACE_TOKEN_DELIMITER '/'
+static constexpr const char FACE_TOKEN_DELIMITER = '/';
 
 enum class ObjType {
     VERTEX,
@@ -83,23 +83,23 @@ public:
 
 	void loadObjFromFile(const std::string& filename);
 
-	const std::vector<Vertex> getVertices() const { return this->m_vertices; }
+	[[nodiscard]] const std::vector<Vertex> getVertices() const { return this->m_vertices; }
 
-	std::vector<TexCoord> getTexCoords() const { return this->m_texcoords; }
+	[[nodiscard]] std::vector<TexCoord> getTexCoords() const { return this->m_texcoords; }
 
-	std::vector<Normal> getNormals() const { return this->m_normals; }
+	[[nodiscard]] std::vector<Normal> getNormals() const { return this->m_normals; }
 
-	std::vector<Triangle> getTriangles() const { return this->m_triangles; }
+	[[nodiscard]] std::vector<Triangle> getTriangles() const { return this->m_triangles; }
 
-	const std::vector<float> getObjectCenter() const { return this->m_objectCenter; }
+	[[nodiscard]] const std::vector<float> getObjectCenter() const { return this->m_objectCenter; }
 
-	std::unordered_map<std::string, Material> getMaterials() const { return this->m_materials; }
+	[[nodiscard]] std::unordered_map<std::string, Material> getMaterials() const { return this->m_materials; }
 
-	const std::vector<RenderBatch> getRenderBatches() const { return this->m_renderBatches; }
+	[[nodiscard]] const std::vector<RenderBatch> getRenderBatches() const { return this->m_renderBatches; }
 
-	std::vector<unsigned int> getRenderIndices() const;
+	[[nodiscard]] std::vector<unsigned int> getRenderIndices() const;
 
-	std::vector<float> getRenderVerticesArray() const;
+	[[nodiscard]] std::vector<float> getRenderVerticesArray() const;
 
 private:
 	std::vector<Vertex>             			m_vertices;
