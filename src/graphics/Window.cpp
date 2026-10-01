@@ -6,10 +6,10 @@
 #include <cmath>
 #include <cstddef>
 #include <iostream>
+#include <memory>
 
 Window::Window(Object3d& renderable) :
 	m_renderable(renderable),
-	m_engine(nullptr),
 	m_deltaTime(0.0f),
 	m_currentWindowWidth(DEFAULT_WINDOW_WIDTH),
 	m_currentWindowHeight(DEFAULT_WINDOW_HEIGHT)
@@ -37,16 +37,14 @@ Window::Window(Object3d& renderable) :
         std::exit(1);
     }
 	glViewport(0, 0, m_currentWindowWidth, m_currentWindowHeight);
-	this->m_engine = new OpenGlEngine(renderable);
+	this->m_engine = std::make_unique<OpenGlEngine>(OpenGlEngine(renderable));
 }
-
-Window::~Window() {}
 
 void Window::run() {
     double lastTime = glfwGetTime();
 
     while (!glfwWindowShouldClose(m_window)) {
-        double currentTime = glfwGetTime();
+        const double currentTime = glfwGetTime();
         m_deltaTime = currentTime - lastTime;
         lastTime = currentTime;
 
@@ -118,7 +116,6 @@ void Window::error_callback(int error, const char* description) {
 }
 
 void Window::cleanGlfw() {
-    delete this->m_engine;
     glfwDestroyWindow(this->m_window);
     glfwTerminate();
 }
